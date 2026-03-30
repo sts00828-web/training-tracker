@@ -268,6 +268,12 @@ body{
   background:#fee;color:var(--red);font-size:16px;cursor:pointer;
   flex-shrink:0;display:flex;align-items:center;justify-content:center;
 }
+.sched-edit{
+  width:28px;height:28px;border-radius:6px;border:none;
+  background:#e8f0fe;color:var(--blue);font-size:14px;cursor:pointer;
+  flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  margin-right:4px;
+}
 .sched-add{
   width:100%;padding:10px;border:2px dashed var(--border);border-radius:8px;
   background:none;font-size:13px;color:var(--text2);cursor:pointer;
@@ -415,6 +421,34 @@ body{
       <button class="modal-btn" onclick="addCustomExercise()">カスタム種目を追加</button>
     </div>
     <button class="modal-btn secondary" onclick="closeAddEx()">閉じる</button>
+  </div>
+</div>
+
+<!-- Edit Custom Exercise Modal -->
+<div id="editExModal" class="modal-ov hidden">
+  <div class="modal">
+    <h2>カスタム種目を編集</h2>
+    <input type="hidden" id="edit-ex-id">
+    <div class="modal-field"><label>種目名</label><input id="edit-ex-name" type="text"></div>
+    <div class="modal-field"><label>パラメータ</label><input id="edit-ex-params" type="text" placeholder="例：3set × 12rep"></div>
+    <div class="modal-field"><label>説明（任意）</label><input id="edit-ex-detail" type="text"></div>
+    <div class="modal-field">
+      <label>カテゴリ（グループ分け）</label>
+      <select id="edit-ex-cat" class="modal-sel">
+        <option value="custom">カスタム</option>
+        <option value="hang">指力トレーニング</option>
+        <option value="climbing">クライミング</option>
+        <option value="power">パワー補強</option>
+        <option value="shoulder">右肩 IR強化</option>
+        <option value="hip">股関節モビリティ</option>
+        <option value="ankle">足首モビリティ</option>
+        <option value="daily">毎日ケア</option>
+        <option value="care">セルフケア</option>
+      </select>
+    </div>
+    <button class="modal-btn" onclick="saveEditCustomEx()">保存</button>
+    <button class="modal-btn secondary" style="background:none;color:var(--red);border:1.5px solid var(--red);margin-top:8px" onclick="deleteCustomExercise()">この種目を完全に削除</button>
+    <button class="modal-btn secondary" onclick="closeEditEx()">キャンセル</button>
   </div>
 </div>
 
@@ -1132,12 +1166,14 @@ function renderSettings() {
   for (const id of allIds) {
     const ex = getExercise(id);
     const isDaily = daily.includes(id);
+    const isCustom = id.startsWith('custom_');
     html += `<div class="sched-item">
       <div class="sched-item-info">
         <div class="sched-item-nm">${ex.name} ${isDaily ? '<span style="font-size:10px;color:var(--text2)">[毎日]</span>' : ''}</div>
         <div class="sched-item-pm">${ex.params}</div>
       </div>
-      <button class="sched-del" onclick="removeExFromDay(${activeDow},'${id}')" title="削除">×</button>
+      ${isCustom ? `<button class="sched-edit" onclick="openEditCustomEx('${id}')" title="編集">✏</button>` : ''}
+      <button class="sched-del" onclick="removeExFromDay(${activeDow},'${id}')" title="この日から外す">×</button>
     </div>`;
   }
 
@@ -1149,16 +1185,36 @@ function renderSettings() {
     <div class="set-section-ttl">毎日ケア（全日共通）</div>`;
   for (const id of daily) {
     const ex = getExercise(id);
+    const isCustom = id.startsWith('custom_');
     html += `<div class="sched-item">
       <div class="sched-item-info">
         <div class="sched-item-nm">${ex.name}</div>
         <div class="sched-item-pm">${ex.params}</div>
       </div>
+      ${isCustom ? `<button class="sched-edit" onclick="openEditCustomEx('${id}')" title="編集">✏</button>` : ''}
       <button class="sched-del" onclick="removeDailyEx('${id}')">×</button>
     </div>`;
   }
   html += `<button class="sched-add" onclick="openAddEx('daily')">＋ 毎日ケア種目を追加</button>
   </div>`;
+
+  // Custom exercises master list
+  const customExs = (S && S.customExercises) ? Object.entries(S.customExercises) : [];
+  if (customExs.length > 0) {
+    html += `<div class="set-section">
+      <div class="set-section-ttl">カスタム種目一覧</div>`;
+    for (const [id, ex] of customExs) {
+      html += `<div class="sched-item">
+        <div class="sched-item-info">
+          <div class="sched-item-nm">${ex.name}</div>
+          <div class="sched-item-pm">${ex.params} <span style="color:var(--text2);font-size:10px">／ ${CAT_LABEL[ex.cat]||ex.cat}</span></div>
+        </div>
+        <button class="sched-edit" onclick="openEditCustomEx('${id}')" title="編集">✏</button>
+        <button class="sched-del" onclick="confirmDeleteCustomEx('${id}')" title="完全削除">🗑</button>
+      </div>`;
+    }
+    html += `</div>`;
+  }
 
   // Data management
   html += `<div class="set-section">
@@ -1343,6 +1399,69 @@ function addCustomExercise() {
   showToast(`「${name}」を追加しました`);
 }
 
+function openEditCustomEx(id) {
+  const ex = getExercise(id);
+  document.getElementById('edit-ex-id').value = id;
+  document.getElementById('edit-ex-name').value = ex.name;
+  document.getElementById('edit-ex-params').value = ex.params;
+  document.getElementById('edit-ex-detail').value = ex.detail || '';
+  document.getElementById('edit-ex-cat').value = ex.cat || 'custom';
+  document.getElementById('editExModal').classList.remove('hidden');
+}
+
+function closeEditEx() {
+  document.getElementById('editExModal').classList.add('hidden');
+}
+
+function saveEditCustomEx() {
+  const id = document.getElementById('edit-ex-id').value;
+  const name = document.getElementById('edit-ex-name').value.trim();
+  if (!name) { showToast('種目名を入力してください'); return; }
+  if (!S.customExercises) S.customExercises = {};
+  S.customExercises[id] = {
+    name,
+    params: document.getElementById('edit-ex-params').value.trim(),
+    detail: document.getElementById('edit-ex-detail').value.trim(),
+    cat: document.getElementById('edit-ex-cat').value || 'custom',
+  };
+  saveSettings();
+  closeEditEx();
+  renderSettings();
+  showToast('保存しました');
+}
+
+function deleteCustomExercise() {
+  const id = document.getElementById('edit-ex-id').value;
+  if (!confirm('この種目を完全に削除しますか？\n全日のスケジュールからも削除されます。')) return;
+  _removeCustomExEverywhere(id);
+  closeEditEx();
+  renderSettings();
+  showToast('削除しました');
+}
+
+function confirmDeleteCustomEx(id) {
+  if (!confirm('この種目を完全に削除しますか？\n全日のスケジュールからも削除されます。')) return;
+  _removeCustomExEverywhere(id);
+  renderSettings();
+  showToast('削除しました');
+}
+
+function _removeCustomExEverywhere(id) {
+  if (!S.customExercises) return;
+  delete S.customExercises[id];
+  // Remove from all day schedules
+  if (S.schedule) {
+    for (const day of S.schedule) {
+      day.exids = day.exids.filter(e => e !== id);
+    }
+  }
+  // Remove from daily
+  if (S.dailyExids) {
+    S.dailyExids = S.dailyExids.filter(e => e !== id);
+  }
+  saveSettings();
+}
+
 function resetSchedule() {
   if (!confirm('スケジュールをデフォルトに戻しますか？\nカスタム種目は削除されません。')) return;
   S.schedule = JSON.parse(JSON.stringify(DEFAULT_SCHEDULE));
@@ -1421,6 +1540,9 @@ function init() {
   // Close add ex modal on overlay click
   document.getElementById('addExModal').addEventListener('click', function(e) {
     if (e.target === this) closeAddEx();
+  });
+  document.getElementById('editExModal').addEventListener('click', function(e) {
+    if (e.target === this) closeEditEx();
   });
 }
 
