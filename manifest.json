@@ -1,0 +1,17 @@
+{
+  "name": "V8 Training Tracker",
+  "short_name": "V8 Tracker",
+  "description": "クライミングV8パフォーマンスプログラム管理アプリ",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#1a1a1a",
+  "theme_color": "#ff7a3d",
+  "lang": "ja",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='32' fill='%231a1a1a'/><text y='130' x='20' font-size='110' font-family='Arial Black,sans-serif' fill='%23ff7a3d'>V8</text></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    }
+  ]
+}

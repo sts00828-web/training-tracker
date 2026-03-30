@@ -1,0 +1,1435 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>V8 Training Tracker</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#ff7a3d">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<style>
+:root{
+  --bg:#f5f3f0;--card:#fff;--border:#ddd;--text:#1a1a1a;--text2:#666;
+  --orange:#ff7a3d;--blue:#1a6ea8;--green:#2a7a22;--red:#cc2222;--amber:#e07b00;
+  --dark:#1a1a1a;--nav:64px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{
+  background:var(--bg);color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans JP',sans-serif;
+  font-size:15px;line-height:1.6;max-width:600px;margin:0 auto;
+  padding-bottom:calc(var(--nav) + 8px);
+}
+/* Header */
+.hdr{
+  background:var(--dark);color:#fff;padding:10px 16px 10px;
+  position:sticky;top:0;z-index:20;border-bottom:3px solid var(--orange);
+}
+.hdr-top{display:flex;justify-content:space-between;align-items:center}
+.hdr-name{font-size:12px;color:#aaa;letter-spacing:1px}
+.hdr-date{font-size:12px;color:#aaa}
+.hdr-phase{
+  font-size:11px;font-weight:700;background:var(--orange);
+  color:#fff;padding:2px 10px;border-radius:20px;
+}
+.hdr-eval{font-size:11px;color:var(--orange);margin-top:4px;text-align:center}
+/* Tabs */
+.panel{display:none;padding:12px 16px}
+.panel.active{display:block}
+/* Bottom nav */
+.nav{
+  position:fixed;bottom:0;left:50%;transform:translateX(-50%);
+  width:100%;max-width:600px;height:var(--nav);
+  background:var(--dark);display:flex;border-top:2px solid var(--orange);z-index:20;
+}
+.nbtn{
+  flex:1;background:none;border:none;color:#666;font-size:11px;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:2px;transition:color .2s;
+}
+.nbtn .ico{font-size:20px}
+.nbtn.on{color:var(--orange)}
+/* Day banner */
+.banner{
+  border-radius:10px;padding:14px 16px;margin-bottom:16px;
+  color:#fff;overflow:hidden;position:relative;
+}
+.banner.climbing{background:linear-gradient(135deg,#b04500,#ff7a3d)}
+.banner.strength{background:linear-gradient(135deg,#0d3a6a,#1a6ea8)}
+.banner.rest{background:linear-gradient(135deg,#333,#666)}
+.banner-tag{font-size:10px;letter-spacing:3px;opacity:.8;font-weight:700}
+.banner-title{font-size:22px;font-weight:800;letter-spacing:1px}
+.banner-sub{font-size:13px;opacity:.85}
+/* Completion bar */
+.comp-row{
+  display:flex;align-items:center;gap:10px;margin-bottom:16px;
+}
+.comp-pct{font-size:32px;font-weight:800;color:var(--orange);line-height:1;min-width:64px}
+.comp-detail{flex:1}
+.comp-label{font-size:12px;color:var(--text2);margin-bottom:4px}
+.bar-bg{background:var(--border);border-radius:4px;height:8px}
+.bar-fg{height:8px;border-radius:4px;background:var(--orange);transition:width .3s}
+/* Exercise group */
+.ex-group{margin-bottom:14px}
+.ex-group-hd{
+  font-size:10px;font-weight:700;letter-spacing:2px;color:var(--text2);
+  text-transform:uppercase;margin-bottom:6px;padding-bottom:4px;
+  border-bottom:1px solid var(--border);
+}
+/* Exercise item */
+.exitem{
+  display:flex;align-items:flex-start;gap:10px;padding:11px 12px;
+  background:var(--card);border:1.5px solid var(--border);border-radius:8px;
+  margin-bottom:6px;cursor:pointer;transition:background .15s,border-color .15s;
+  user-select:none;
+}
+.exitem.done{background:#f0fff4;border-color:var(--green)}
+.chkbox{
+  width:22px;height:22px;border:2px solid #bbb;border-radius:6px;
+  flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  margin-top:1px;transition:all .2s;font-size:13px;
+}
+.exitem.done .chkbox{background:var(--green);border-color:var(--green);color:#fff}
+.ex-info{flex:1;min-width:0}
+.ex-nm{font-weight:700;font-size:13.5px}
+.ex-pm{font-size:11.5px;color:var(--blue);font-weight:700;margin-top:1px}
+.ex-dt{font-size:11.5px;color:var(--text2);margin-top:2px;line-height:1.5}
+/* Daily log */
+.logcard{
+  background:var(--card);border:1.5px solid var(--border);
+  border-radius:10px;padding:14px;margin-bottom:14px;
+}
+.logcard-ttl{
+  font-weight:700;font-size:13px;margin-bottom:12px;padding-bottom:8px;
+  border-bottom:1px solid var(--border);
+}
+.logrow{margin-bottom:12px}
+.loglabel{font-size:12px;color:var(--text2);font-weight:600;margin-bottom:5px;display:flex;justify-content:space-between;align-items:center}
+/* Finger buttons */
+.fbts{display:flex;gap:6px}
+.fbt{
+  flex:1;padding:7px 4px;border:2px solid var(--border);border-radius:7px;
+  background:none;font-size:11.5px;cursor:pointer;text-align:center;
+  font-weight:700;color:var(--text2);transition:all .15s;
+}
+.fbt.sel-good{background:var(--green);border-color:var(--green);color:#fff}
+.fbt.sel-ok{background:var(--blue);border-color:var(--blue);color:#fff}
+.fbt.sel-tight{background:var(--amber);border-color:var(--amber);color:#fff}
+.fbt.sel-pain{background:var(--red);border-color:var(--red);color:#fff}
+/* Input */
+.inp{
+  width:100%;padding:8px 12px;border:2px solid var(--border);border-radius:8px;
+  font-size:16px;background:#fff;color:var(--text);
+}
+.inp:focus{outline:none;border-color:var(--orange)}
+.inp-row{display:flex;gap:10px}
+.inp-field{flex:1}
+.inp-field label{display:block;font-size:11px;color:var(--text2);margin-bottom:4px;font-weight:600}
+/* RPE */
+.rpe-wrap{display:flex;align-items:center;gap:10px}
+.rpe-val{
+  min-width:32px;font-size:22px;font-weight:800;
+  color:var(--orange);text-align:center;
+}
+.rpe-sl{
+  flex:1;-webkit-appearance:none;height:6px;border-radius:3px;
+  background:var(--border);outline:none;cursor:pointer;
+}
+.rpe-sl::-webkit-slider-thumb{
+  -webkit-appearance:none;width:22px;height:22px;
+  border-radius:50%;background:var(--orange);cursor:pointer;
+}
+.rpe-sl::-moz-range-thumb{
+  width:22px;height:22px;border-radius:50%;background:var(--orange);border:none;
+}
+.rpe-lbl{display:flex;justify-content:space-between;font-size:10px;color:var(--text2);margin-top:3px}
+/* Textarea */
+.textarea{
+  width:100%;border:2px solid var(--border);border-radius:8px;
+  padding:8px 12px;font-size:14px;min-height:64px;resize:vertical;
+  font-family:inherit;
+}
+.textarea:focus{outline:none;border-color:var(--orange)}
+/* Alert box */
+.alertbox{
+  background:#fff8e1;border:2px solid var(--amber);border-radius:8px;
+  padding:12px;font-size:13px;margin-bottom:14px;color:var(--dark);line-height:1.6;
+}
+.alertbox strong{color:#a05000}
+/* Toggle row */
+.toggle-row{display:flex;align-items:center;gap:10px;margin-top:6px}
+.toggle-sw{
+  width:44px;height:24px;background:var(--border);border-radius:12px;
+  position:relative;cursor:pointer;transition:background .2s;flex-shrink:0;
+}
+.toggle-sw.on{background:var(--amber)}
+.toggle-sw::after{
+  content:'';position:absolute;width:18px;height:18px;
+  background:#fff;border-radius:50%;top:3px;left:3px;transition:left .2s;
+}
+.toggle-sw.on::after{left:23px}
+.toggle-lbl{font-size:13px;color:var(--dark)}
+/* Calendar */
+.cal-nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.cal-navbtn{
+  background:none;border:1.5px solid var(--border);border-radius:7px;
+  padding:5px 14px;font-size:14px;cursor:pointer;
+}
+.cal-month-lbl{font-weight:700;font-size:15px}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.cal-dow{text-align:center;font-size:10px;font-weight:700;color:var(--text2);padding:4px 0}
+.cal-day{
+  aspect-ratio:1;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;border-radius:7px;font-size:12px;cursor:pointer;
+  border:1.5px solid transparent;transition:background .15s;
+}
+.cal-day:hover{background:#e8e4e0}
+.cal-day.today{border-color:var(--orange);font-weight:700}
+.cal-day.other{opacity:.3;pointer-events:none}
+.cal-day.eval-day{background:rgba(255,122,61,.12)}
+.cal-dot{width:6px;height:6px;border-radius:50%;margin-top:2px}
+.cal-dot.full{background:var(--green)}
+.cal-dot.part{background:var(--amber)}
+.cal-dot.low{background:var(--red)}
+.cal-dot.eval{background:var(--orange);width:8px;height:8px}
+/* Detail popup on calendar */
+.cal-detail{
+  background:var(--card);border:1.5px solid var(--border);border-radius:10px;
+  padding:14px;margin-top:12px;
+}
+.cal-detail-ttl{font-weight:700;font-size:14px;margin-bottom:8px}
+/* Progress stats */
+.statcard{
+  background:var(--card);border:1.5px solid var(--border);
+  border-radius:10px;padding:14px;margin-bottom:12px;
+}
+.statcard-ttl{font-weight:700;font-size:13px;margin-bottom:10px;color:var(--dark)}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.stat-item{text-align:center;padding:10px;background:var(--bg);border-radius:8px}
+.stat-val{font-size:26px;font-weight:800;color:var(--orange)}
+.stat-lbl{font-size:11px;color:var(--text2);margin-top:2px}
+/* KPI list */
+.kpi-item{
+  display:flex;justify-content:space-between;align-items:flex-start;
+  padding:8px 0;border-bottom:1px solid var(--border);
+}
+.kpi-item:last-child{border:none}
+.kpi-lbl{font-size:13px;color:var(--text)}
+.kpi-tgt{
+  font-size:12px;font-weight:700;color:var(--blue);
+  text-align:right;min-width:120px;
+}
+/* Weight chart */
+.wchart{display:flex;align-items:flex-end;gap:3px;height:80px;margin-top:6px}
+.wbar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px}
+.wbar{width:100%;background:var(--orange);border-radius:3px 3px 0 0;min-height:2px}
+.wbar-d{font-size:8px;color:var(--text2)}
+.wbar-v{font-size:9px;color:var(--text2)}
+.wchart-empty{font-size:13px;color:var(--text2);text-align:center;padding:20px 0}
+/* Settings */
+.set-section{margin-bottom:20px}
+.set-section-ttl{
+  font-size:11px;font-weight:700;letter-spacing:2px;color:var(--text2);
+  text-transform:uppercase;margin-bottom:8px;padding-bottom:4px;
+  border-bottom:1px solid var(--border);
+}
+.set-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 0;border-bottom:1px solid #f0f0f0;
+}
+.set-row:last-child{border:none}
+.set-lbl{font-size:14px;font-weight:600;color:var(--text)}
+.set-sublbl{font-size:11px;color:var(--text2)}
+.set-inp{
+  border:1.5px solid var(--border);border-radius:7px;
+  padding:6px 10px;font-size:14px;background:#fff;text-align:right;
+}
+.set-inp:focus{outline:none;border-color:var(--orange)}
+/* Schedule editor */
+.dow-tabs{display:flex;gap:4px;margin-bottom:12px;overflow-x:auto;padding-bottom:2px}
+.dow-tab{
+  flex-shrink:0;padding:6px 12px;border-radius:20px;border:1.5px solid var(--border);
+  background:none;font-size:12px;font-weight:700;cursor:pointer;color:var(--text2);
+  transition:all .15s;
+}
+.dow-tab.on{background:var(--dark);border-color:var(--dark);color:#fff}
+.sched-item{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 12px;background:var(--card);border:1.5px solid var(--border);
+  border-radius:8px;margin-bottom:6px;
+}
+.sched-item-info{flex:1;min-width:0}
+.sched-item-nm{font-weight:700;font-size:13px}
+.sched-item-pm{font-size:11px;color:var(--blue)}
+.sched-del{
+  width:28px;height:28px;border-radius:6px;border:none;
+  background:#fee;color:var(--red);font-size:16px;cursor:pointer;
+  flex-shrink:0;display:flex;align-items:center;justify-content:center;
+}
+.sched-add{
+  width:100%;padding:10px;border:2px dashed var(--border);border-radius:8px;
+  background:none;font-size:13px;color:var(--text2);cursor:pointer;
+  transition:border-color .15s,color .15s;margin-top:4px;
+}
+.sched-add:hover{border-color:var(--orange);color:var(--orange)}
+/* Danger / reset btn */
+.danger-btn{
+  width:100%;padding:11px;border:2px solid var(--red);border-radius:8px;
+  background:none;color:var(--red);font-size:13px;font-weight:700;cursor:pointer;
+  transition:background .15s;margin-top:6px;
+}
+.danger-btn:active{background:#fee}
+/* Modal */
+.modal-ov{
+  position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:100;
+  display:flex;align-items:flex-end;justify-content:center;padding:0;
+}
+.modal-ov.center{align-items:center;padding:20px}
+.modal-ov.hidden{display:none}
+.modal{
+  background:#fff;border-radius:20px 20px 0 0;padding:20px 20px 32px;
+  width:100%;max-width:600px;max-height:85vh;overflow-y:auto;
+}
+.modal.rounded{border-radius:16px;max-height:90vh}
+.modal h2{font-size:18px;font-weight:800;margin-bottom:6px}
+.modal p{font-size:13px;color:var(--text2);margin-bottom:16px;line-height:1.6}
+.modal-field{margin-bottom:14px}
+.modal-field label{display:block;font-size:12px;font-weight:700;margin-bottom:5px;color:var(--text2)}
+.modal-field input,.modal-field textarea{
+  width:100%;padding:9px 12px;border:2px solid var(--border);
+  border-radius:8px;font-size:15px;font-family:inherit;
+}
+.modal-field input:focus,.modal-field textarea:focus{outline:none;border-color:var(--orange)}
+.modal-sel{
+  width:100%;padding:9px 12px;border:2px solid var(--border);
+  border-radius:8px;font-size:15px;font-family:inherit;background:#fff;
+  color:var(--text);appearance:none;-webkit-appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23666' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;
+}
+.modal-sel:focus{outline:none;border-color:var(--orange)}
+.modal-btn{
+  width:100%;padding:13px;background:var(--orange);color:#fff;
+  border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;
+  transition:background .15s;margin-top:4px;
+}
+.modal-btn:active{background:#e05020}
+.modal-btn.secondary{background:none;color:var(--text2);border:1.5px solid var(--border);margin-top:8px}
+.ex-list-search{
+  width:100%;padding:8px 12px;border:2px solid var(--border);
+  border-radius:8px;font-size:14px;margin-bottom:10px;
+}
+.ex-list-search:focus{outline:none;border-color:var(--orange)}
+.ex-list-item{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer;
+}
+.ex-list-item:hover .ex-add-btn{background:var(--green);border-color:var(--green);color:#fff}
+.ex-add-btn{
+  width:28px;height:28px;border-radius:6px;border:1.5px solid var(--border);
+  background:none;font-size:16px;cursor:pointer;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+}
+/* Streak */
+.streak-badge{
+  display:flex;align-items:center;gap:6px;
+  background:var(--dark);color:var(--orange);padding:6px 14px;
+  border-radius:20px;font-weight:800;font-size:13px;
+}
+/* Toast */
+.toast{
+  position:fixed;bottom:calc(var(--nav) + 12px);left:50%;transform:translateX(-50%);
+  background:var(--dark);color:#fff;padding:9px 20px;border-radius:24px;
+  font-size:13px;font-weight:600;z-index:200;opacity:0;
+  transition:opacity .25s;pointer-events:none;white-space:nowrap;
+}
+.toast.show{opacity:1}
+/* Divider */
+.divider{height:1px;background:var(--border);margin:8px 0}
+/* Section title */
+.sec-ttl{
+  font-weight:700;font-size:14px;margin-bottom:10px;
+  display:flex;align-items:center;gap:8px;
+}
+.sec-ttl-line{flex:1;height:1px;background:var(--border)}
+</style>
+</head>
+<body>
+
+<!-- Setup Modal -->
+<div id="setupModal" class="modal-ov center">
+  <div class="modal rounded">
+    <h2>🧗 V8 Training Tracker</h2>
+    <p>プログラムの設定をしてください。<br>後から設定タブで変更できます。</p>
+    <div class="modal-field">
+      <label>お名前</label>
+      <input id="su-name" type="text" placeholder="鈴木達也" value="鈴木達也">
+    </div>
+    <div class="modal-field">
+      <label>プログラム開始日</label>
+      <input id="su-start" type="date">
+    </div>
+    <div class="modal-field">
+      <label>評価日 Month 1</label>
+      <input id="su-ev1" type="date">
+    </div>
+    <div class="modal-field">
+      <label>評価日 Month 2</label>
+      <input id="su-ev2" type="date">
+    </div>
+    <div class="modal-field">
+      <label>評価日 Month 3（最終）</label>
+      <input id="su-ev3" type="date">
+    </div>
+    <button class="modal-btn" onclick="setupSave()">はじめる</button>
+  </div>
+</div>
+
+<!-- Add Exercise Modal -->
+<div id="addExModal" class="modal-ov hidden">
+  <div class="modal">
+    <h2>種目を追加</h2>
+    <input class="ex-list-search" id="exSearch" type="text" placeholder="種目を検索..." oninput="renderExList()">
+    <div id="exListArea"></div>
+    <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border)">
+      <div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:10px">カスタム種目を追加</div>
+      <div class="modal-field"><label>種目名</label><input id="cust-name" type="text" placeholder="例：チューブローイング"></div>
+      <div class="modal-field"><label>パラメータ</label><input id="cust-params" type="text" placeholder="例：3set × 12rep"></div>
+      <div class="modal-field"><label>説明（任意）</label><input id="cust-detail" type="text" placeholder="例：肩甲骨を寄せながら引く"></div>
+      <div class="modal-field">
+        <label>カテゴリ（グループ分け）</label>
+        <select id="cust-cat" class="modal-sel">
+          <option value="custom">カスタム</option>
+          <option value="hang">指力トレーニング</option>
+          <option value="climbing">クライミング</option>
+          <option value="power">パワー補強</option>
+          <option value="shoulder">右肩 IR強化</option>
+          <option value="hip">股関節モビリティ</option>
+          <option value="ankle">足首モビリティ</option>
+          <option value="daily">毎日ケア</option>
+          <option value="care">セルフケア</option>
+        </select>
+      </div>
+      <button class="modal-btn" onclick="addCustomExercise()">カスタム種目を追加</button>
+    </div>
+    <button class="modal-btn secondary" onclick="closeAddEx()">閉じる</button>
+  </div>
+</div>
+
+<!-- Header -->
+<header class="hdr">
+  <div class="hdr-top">
+    <span id="hdr-name" class="hdr-name">V8 PROGRAM</span>
+    <span id="hdr-phase" class="hdr-phase">MONTH 1</span>
+    <span id="hdr-date" class="hdr-date"></span>
+  </div>
+  <div id="hdr-eval" class="hdr-eval"></div>
+</header>
+
+<!-- Main -->
+<main>
+  <!-- Tab: Today -->
+  <div id="tab-today" class="panel active">
+    <div id="today-content"></div>
+  </div>
+
+  <!-- Tab: Calendar -->
+  <div id="tab-cal" class="panel">
+    <div class="cal-nav">
+      <button class="cal-navbtn" onclick="calPrev()">‹</button>
+      <span id="cal-month-lbl" class="cal-month-lbl"></span>
+      <button class="cal-navbtn" onclick="calNext()">›</button>
+    </div>
+    <div id="cal-grid" class="cal-grid"></div>
+    <div id="cal-detail"></div>
+  </div>
+
+  <!-- Tab: Progress -->
+  <div id="tab-prog" class="panel">
+    <div id="prog-content"></div>
+  </div>
+
+  <!-- Tab: Settings -->
+  <div id="tab-set" class="panel">
+    <div id="set-content"></div>
+  </div>
+</main>
+
+<!-- Bottom Nav -->
+<nav class="nav">
+  <button class="nbtn on" id="nbtn-today" onclick="switchTab('today')">
+    <span class="ico">📋</span>今日
+  </button>
+  <button class="nbtn" id="nbtn-cal" onclick="switchTab('cal')">
+    <span class="ico">📅</span>カレンダー
+  </button>
+  <button class="nbtn" id="nbtn-prog" onclick="switchTab('prog')">
+    <span class="ico">📊</span>進捗
+  </button>
+  <button class="nbtn" id="nbtn-set" onclick="switchTab('set')">
+    <span class="ico">⚙️</span>設定
+  </button>
+</nav>
+
+<div id="toast" class="toast"></div>
+
+<script>
+// ══════════════════════════════════════════
+//  MASTER DATA
+// ══════════════════════════════════════════
+const EXERCISES_MASTER = {
+  // Hang
+  max_hangs:      { name:'Max Hangs 20mm', params:'5–6set × 10秒 | 休息3分', cat:'hang', detail:'MVC 90–95%。木曜指の張りがある場合はRepeatersに変更' },
+  repeaters:      { name:'Repeaters 20mm', params:'4set（7s on/3s off × 6rep）| 休息3分', cat:'hang', detail:'低強度 BW 40–50%' },
+  dead_hang:      { name:'Dead Hang ウォームアップ', params:'2set × 30秒 | 休息2分', cat:'hang', detail:'クライミング前。両手フルデッドハング' },
+  // Climbing
+  climbing_max:   { name:'MAX課題 V8–V9', params:'×60分', cat:'climbing', detail:'アップ15分後。最高グレード課題への挑戦' },
+  climbing_volume:{ name:'V6–V7 ボリューム', params:'8–10本', cat:'climbing', detail:'ボリューム日。本数を確実にこなす' },
+  climbing_explore:{ name:'V7–V8 課題反復 / MAX試登', params:'探究日', cat:'climbing', detail:'V7-V8の反復。V8以上にも積極的に触れる' },
+  foot_drill:     { name:'フット精度ドリル', params:'課題内で実施', cat:'climbing', detail:'足の置き方・精度を意識して登る' },
+  // Power
+  campus_ladder:  { name:'Campus Board（1-2-3）', params:'4–5set × 1往復 | 休息3分', cat:'power', detail:'ナローグリップ。1→2→3をリズミカルにアップ' },
+  explosive_pullup:{ name:'Explosive Pull-up', params:'4set × 3–5rep | 休息3分', cat:'power', detail:'最速で引き付け胸をバーに。全力3-5回' },
+  lockoff:        { name:'Lock-off Hold（3角度）', params:'3set × 10秒 × 3角度 | 休息2分', cat:'power', detail:'90°・120°・フル引き付けの3角度' },
+  // Shoulder
+  ir_band:        { name:'IR Cable/Band 右（90/90位）', params:'3set × 15–20rep | 休息60秒', cat:'shoulder', detail:'3秒内旋・3秒戻し。チューブをドアノブに固定' },
+  bear_hug:       { name:'Bear Hug / Self-IR Press', params:'3set × 10秒 × 5rep | 休息30秒', cat:'shoulder', detail:'肩甲下筋等尺性収縮。道具不要' },
+  scapula_prot:   { name:'肩甲骨プロトラクション', params:'3set × 15rep | 休息45秒', cat:'shoulder', detail:'セラバンドで前方に押し出す。前鋸筋・肩甲下筋の協調活性' },
+  underclinging:  { name:'アンダークリング意識', params:'ウォームアップで10–15回', cat:'shoulder', detail:'低難度課題でアンダーを意識的に使う' },
+  // Hip
+  coach_stretch:  { name:'コーチストレッチ（内転筋）', params:'3set × 45秒', cat:'hip', detail:'側臥位で上側の脚を外転。吐く息に合わせて沈む' },
+  highstep_drill: { name:'壁ハイステップドリル', params:'3set × 10rep', cat:'hip', detail:'壁面に足を高く置き股関節外転+外旋でスクワット' },
+  straddle:       { name:'Loaded Progressive Straddle', params:'3set × 60秒', cat:'hip', detail:'壁に向かい最大開脚。膝伸展・骨盤前傾を保つ' },
+  // Ankle
+  banded_ankle:   { name:'Banded Ankle Mobilization', params:'2set × 10rep', cat:'ankle', detail:'チューブをアキレス腱後方に。距骨の前方グライドを補助' },
+  calf_raise:     { name:'カーフレイズ（片足・フルレンジ）', params:'3set × 15rep', cat:'ankle', detail:'踵を最大限下げてから爪先立ち。段差利用' },
+  wblt:           { name:'WBLT Stretch（右足首）', params:'3set × 45秒', cat:'ankle', detail:'壁から膝を近づける。距離を毎日少しずつ広げる' },
+  // Daily care
+  sleeper_stretch:{ name:'Sleeper Stretch（右）', params:'3set × 30秒保持 | 就寝前', cat:'daily', detail:'側臥位・右肩90°屈曲・IR方向に押し込む' },
+  finger_care:    { name:'指セルフケア', params:'前腕マッサージ 5分', cat:'care', detail:'前腕屈筋腱のセルフマッサージ。冷水浸漬（15-20℃, 5分）も有効' },
+};
+
+const CAT_LABEL = {
+  hang:'指力トレーニング', climbing:'クライミング', power:'パワー補強',
+  shoulder:'右肩 IR強化', hip:'股関節モビリティ', ankle:'足首モビリティ',
+  daily:'毎日ケア', care:'セルフケア', custom:'カスタム'
+};
+
+const DEFAULT_DAILY = ['sleeper_stretch', 'straddle', 'wblt'];
+
+const DEFAULT_SCHEDULE = [
+  // 0=Sun
+  { type:'climbing', label:'CLIMBING A', sub:'強度日（休日）',
+    exids:['dead_hang','climbing_max','campus_ladder','underclinging','finger_care'] },
+  // 1=Mon
+  { type:'strength', label:'HANG 昼（軽）', sub:'昼休みトレーニング',
+    exids:['repeaters','ir_band','bear_hug','calf_raise'] },
+  // 2=Tue
+  { type:'climbing', label:'CLIMBING B', sub:'ボリューム日',
+    exids:['dead_hang','climbing_volume','foot_drill','explosive_pullup','lockoff',
+           'ir_band','bear_hug','scapula_prot','coach_stretch','highstep_drill',
+           'banded_ankle','calf_raise','finger_care'] },
+  // 3=Wed
+  { type:'rest', label:'REST', sub:'完全オフ（自宅ケア）',
+    exids:['coach_stretch','banded_ankle'] },
+  // 4=Thu
+  { type:'climbing', label:'CLIMBING C', sub:'探究日（休日）',
+    exids:['dead_hang','climbing_explore','lockoff','scapula_prot',
+           'coach_stretch','highstep_drill','banded_ankle','finger_care'] },
+  // 5=Fri
+  { type:'strength', label:'HANG 昼（強）', sub:'昼休みトレーニング',
+    exids:['max_hangs','ir_band','bear_hug','banded_ankle','calf_raise'] },
+  // 6=Sat
+  { type:'rest', label:'FULL REST', sub:'完全休養',
+    exids:['coach_stretch','highstep_drill','banded_ankle'] },
+];
+
+const PHASE_KPIS = [
+  { month:1, label:'MONTH 1 — 基盤構築', color:'#c05000', kpis:[
+    { label:'両手Repeater', target:'4set確実完了' },
+    { label:'右肩IR ROM', target:'内旋60°以上' },
+    { label:'体重', target:'63.5–64 kg' },
+    { label:'足首WBLT右', target:'8.5 cm' },
+  ]},
+  { month:2, label:'MONTH 2 — 強度増大', color:'#1a6ea8', kpis:[
+    { label:'Max Hangs', target:'5set完了' },
+    { label:'右肩ER/IR比', target:'1.15以下' },
+    { label:'体重', target:'62–62.5 kg' },
+    { label:'パワースラップ', target:'65 cm' },
+    { label:'Straddle', target:'46 cm以下' },
+  ]},
+  { month:3, label:'MONTH 3 — 統合・発揮', color:'#2a7a22', kpis:[
+    { label:'指力片手MVC', target:'80–85% BW' },
+    { label:'右肩ER/IR比', target:'≦ 1.10' },
+    { label:'体重', target:'60–61 kg' },
+    { label:'パワースラップ', target:'70 cm' },
+    { label:'WBLT右', target:'9 cm以上' },
+    { label:'Straddle', target:'44 cm以下' },
+  ]},
+];
+
+const DOW_LABEL = ['日','月','火','水','木','金','土'];
+
+// ══════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════
+let S = {}; // settings
+let L = {}; // logs
+let calDate = new Date();
+let calSelectedKey = null;
+let addExTargetDow = null; // which dow we're adding exercises for
+
+function loadState() {
+  try { S = JSON.parse(localStorage.getItem('v8_settings') || 'null') || null; } catch(e){ S = null; }
+  try { L = JSON.parse(localStorage.getItem('v8_logs') || '{}'); } catch(e){ L = {}; }
+}
+function saveSettings() {
+  localStorage.setItem('v8_settings', JSON.stringify(S));
+}
+function saveLog(dk, data) {
+  L[dk] = data;
+  localStorage.setItem('v8_logs', JSON.stringify(L));
+}
+
+// ══════════════════════════════════════════
+//  UTILS
+// ══════════════════════════════════════════
+function dk(d) { // dateKey
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,'0');
+  const dd = String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${dd}`;
+}
+function todayKey() { return dk(new Date()); }
+function parseDate(s) {
+  const [y,m,d] = s.split('-').map(Number);
+  return new Date(y, m-1, d);
+}
+function addDays(d, n) {
+  const r = new Date(d); r.setDate(r.getDate()+n); return r;
+}
+function fmtDate(d) {
+  return `${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日（${DOW_LABEL[d.getDay()]}）`;
+}
+function getPhase() {
+  if (!S || !S.startDate) return 1;
+  const start = parseDate(S.startDate);
+  const today = new Date();
+  const days = Math.floor((today - start) / 86400000);
+  if (days < 30) return 1;
+  if (days < 60) return 2;
+  return 3;
+}
+function getEvalCountdown() {
+  if (!S || !S.evalDates) return null;
+  const today = new Date(); today.setHours(0,0,0,0);
+  for (const d of S.evalDates) {
+    if (!d) continue;
+    const ev = parseDate(d); ev.setHours(0,0,0,0);
+    const diff = Math.round((ev - today) / 86400000);
+    if (diff >= 0) return { days: diff, date: d };
+  }
+  return null;
+}
+function getDayExids(dow) {
+  const sched = (S && S.schedule) ? S.schedule : DEFAULT_SCHEDULE;
+  return sched[dow].exids;
+}
+function getDayInfo(dow) {
+  const sched = (S && S.schedule) ? S.schedule : DEFAULT_SCHEDULE;
+  return sched[dow];
+}
+function getAllExids(dow) {
+  const daily = (S && S.dailyExids) ? S.dailyExids : DEFAULT_DAILY;
+  const day = getDayExids(dow);
+  // merge daily + day exids (avoid dupes)
+  const all = [...day];
+  for (const id of daily) { if (!all.includes(id)) all.push(id); }
+  return all;
+}
+function getExercise(id) {
+  if (S && S.customExercises && S.customExercises[id]) return S.customExercises[id];
+  return EXERCISES_MASTER[id] || { name: id, params:'', cat:'custom', detail:'' };
+}
+function getLog(dateKey) {
+  return L[dateKey] || { done:{}, weight:null, finger:null, rpe:null, sleep:null, note:'' };
+}
+function getCompletion(dateKey, dow) {
+  const log = getLog(dateKey);
+  const exids = getAllExids(dow !== undefined ? dow : parseDate(dateKey).getDay());
+  const total = exids.length;
+  const done = exids.filter(id => log.done && log.done[id]).length;
+  return { done, total, pct: total ? Math.round(done/total*100) : 0 };
+}
+function isEvalDay(dateKey) {
+  if (!S || !S.evalDates) return false;
+  return S.evalDates.includes(dateKey);
+}
+function calcStreak() {
+  const today = new Date(); today.setHours(0,0,0,0);
+  let streak = 0;
+  let d = new Date(today);
+  while (true) {
+    const key = dk(d);
+    const dow = d.getDay();
+    const comp = getCompletion(key, dow);
+    if (comp.pct === 0 && dk(d) !== todayKey()) break;
+    if (comp.pct > 0) streak++;
+    d.setDate(d.getDate()-1);
+    if (streak > 365) break;
+  }
+  return streak;
+}
+
+// ══════════════════════════════════════════
+//  RENDER
+// ══════════════════════════════════════════
+function renderHeader() {
+  if (!S) return;
+  document.getElementById('hdr-name').textContent = (S.name || 'V8 PROGRAM').toUpperCase();
+  document.getElementById('hdr-phase').textContent = `MONTH ${getPhase()}`;
+  const now = new Date();
+  document.getElementById('hdr-date').textContent =
+    `${now.getMonth()+1}/${now.getDate()} ${DOW_LABEL[now.getDay()]}`;
+  const ev = getEvalCountdown();
+  const evalEl = document.getElementById('hdr-eval');
+  if (ev) {
+    if (ev.days === 0) evalEl.textContent = '🎯 今日が評価日！';
+    else evalEl.textContent = `📊 次回評価まで ${ev.days} 日`;
+  } else {
+    evalEl.textContent = '';
+  }
+}
+
+function renderToday() {
+  const now = new Date();
+  const dow = now.getDay();
+  const key = dk(now);
+  const info = getDayInfo(dow);
+  const exids = getAllExids(dow);
+  const log = getLog(key);
+
+  // Check Thursday finger condition for Friday
+  const isFri = dow === 5;
+  const prevKey = dk(addDays(now, -1));
+  const prevLog = getLog(prevKey);
+  const thuTight = isFri && prevLog && (prevLog.finger === 'tight' || prevLog.finger === 'pain');
+
+  // Group exercises by category
+  const groups = {};
+  for (const id of exids) {
+    const ex = getExercise(id);
+    const cat = ex.cat || 'custom';
+    if (!groups[cat]) groups[cat] = [];
+    // Friday: if thuTight, swap max_hangs → repeaters
+    const realId = (isFri && thuTight && id === 'max_hangs') ? 'repeaters' : id;
+    groups[cat].push({ id, realId, ex: getExercise(realId), done: !!(log.done && log.done[id]) });
+  }
+
+  const comp = getCompletion(key, dow);
+  const typeClass = info.type === 'strength' ? 'strength' : info.type === 'rest' ? 'rest' : 'climbing';
+
+  let html = '';
+
+  // Banner
+  html += `<div class="banner ${typeClass}">
+    <div class="banner-tag">${DOW_LABEL[dow]}曜日</div>
+    <div class="banner-title">${info.label}</div>
+    <div class="banner-sub">${info.sub}</div>
+  </div>`;
+
+  // Friday alert
+  if (thuTight) {
+    html += `<div class="alertbox">
+      <strong>⚠ 昨日（木）の指の張りを記録しています。</strong><br>
+      本日のMax HangsはRepeatersに切り替えを推奨。無理をしないこと。
+    </div>`;
+  }
+
+  // Completion
+  html += `<div class="comp-row">
+    <div class="comp-pct">${comp.pct}%</div>
+    <div class="comp-detail">
+      <div class="comp-label">${comp.done} / ${comp.total} 種目完了</div>
+      <div class="bar-bg"><div class="bar-fg" style="width:${comp.pct}%"></div></div>
+    </div>
+  </div>`;
+
+  // Exercise groups
+  const catOrder = ['hang','climbing','power','shoulder','hip','ankle','care','daily','custom'];
+  for (const cat of catOrder) {
+    if (!groups[cat]) continue;
+    html += `<div class="ex-group">
+      <div class="ex-group-hd">${CAT_LABEL[cat] || cat}</div>`;
+    for (const item of groups[cat]) {
+      html += `<div class="exitem ${item.done ? 'done' : ''}" onclick="toggleEx('${key}','${item.id}')">
+        <div class="chkbox">${item.done ? '✓' : ''}</div>
+        <div class="ex-info">
+          <div class="ex-nm">${item.ex.name}</div>
+          ${item.ex.params ? `<div class="ex-pm">${item.ex.params}</div>` : ''}
+          ${item.ex.detail ? `<div class="ex-dt">${item.ex.detail}</div>` : ''}
+        </div>
+      </div>`;
+    }
+    html += `</div>`;
+  }
+
+  // Daily Log
+  const fingerVal = log.finger || '';
+  const rpeVal = log.rpe !== null && log.rpe !== undefined ? log.rpe : 5;
+  const sleepVal = log.sleep || '';
+  const weightVal = log.weight || '';
+
+  html += `<div class="logcard">
+    <div class="logcard-ttl">📝 今日の記録</div>
+
+    <div class="logrow">
+      <div class="loglabel">指の状態</div>
+      <div class="fbts">
+        <button class="fbt ${fingerVal==='good'?'sel-good':''}" onclick="setFinger('${key}','good')">良好<br>😊</button>
+        <button class="fbt ${fingerVal==='ok'?'sel-ok':''}" onclick="setFinger('${key}','ok')">普通<br>😐</button>
+        <button class="fbt ${fingerVal==='tight'?'sel-tight':''}" onclick="setFinger('${key}','tight')">張り<br>😬</button>
+        <button class="fbt ${fingerVal==='pain'?'sel-pain':''}" onclick="setFinger('${key}','pain')">痛み<br>🚨</button>
+      </div>
+    </div>
+
+    <div class="logrow">
+      <div class="inp-row">
+        <div class="inp-field">
+          <label>体重（kg）</label>
+          <input class="inp" type="number" step="0.1" min="50" max="100"
+            value="${weightVal}" placeholder="65.0"
+            onchange="setLogField('${key}','weight',+this.value)"
+            oninput="setLogField('${key}','weight',+this.value)">
+        </div>
+        <div class="inp-field">
+          <label>睡眠（時間）</label>
+          <input class="inp" type="number" step="0.5" min="3" max="12"
+            value="${sleepVal}" placeholder="7.5"
+            onchange="setLogField('${key}','sleep',+this.value)"
+            oninput="setLogField('${key}','sleep',+this.value)">
+        </div>
+      </div>
+    </div>
+
+    <div class="logrow">
+      <div class="loglabel">
+        <span>体感強度 RPE</span>
+        <span id="rpe-val-display" style="color:var(--orange);font-weight:800">${rpeVal}</span>
+      </div>
+      <div class="rpe-wrap">
+        <span class="rpe-val" id="rpe-num">${rpeVal}</span>
+        <input class="rpe-sl" type="range" min="1" max="10" value="${rpeVal}"
+          oninput="document.getElementById('rpe-num').textContent=this.value;document.getElementById('rpe-val-display').textContent=this.value"
+          onchange="setLogField('${key}','rpe',+this.value)">
+      </div>
+      <div class="rpe-lbl"><span>楽</span><span>限界</span></div>
+    </div>
+
+    <div class="logrow">
+      <div class="loglabel">メモ</div>
+      <textarea class="textarea" placeholder="気づきや感想を記録..."
+        onchange="setLogField('${key}','note',this.value)">${log.note || ''}</textarea>
+    </div>
+
+    ${dow === 4 ? `<div class="logrow">
+      <div class="loglabel">明日（金）の指確認</div>
+      <div class="alertbox" style="margin:0">
+        <strong>⚠ 木→金の指チェック</strong><br>
+        今日のトレーニング後に指の張りがある場合は上の「張り」または「痛み」を記録してください。<br>
+        明日（金）の画面に自動で警告が表示されMax Hangsの変更を促します。
+      </div>
+    </div>` : ''}
+  </div>`;
+
+  document.getElementById('today-content').innerHTML = html;
+}
+
+function renderCalendar() {
+  const y = calDate.getFullYear();
+  const m = calDate.getMonth();
+  document.getElementById('cal-month-lbl').textContent = `${y}年${m+1}月`;
+
+  const grid = document.getElementById('cal-grid');
+  let html = DOW_LABEL.map(d => `<div class="cal-dow">${d}</div>`).join('');
+
+  const first = new Date(y, m, 1);
+  const last = new Date(y, m+1, 0);
+  const todayStr = todayKey();
+
+  // padding
+  for (let i = 0; i < first.getDay(); i++) html += `<div></div>`;
+
+  for (let day = 1; day <= last.getDate(); day++) {
+    const d = new Date(y, m, day);
+    const key = dk(d);
+    const dow = d.getDay();
+    const isToday = key === todayStr;
+    const isEval = isEvalDay(key);
+    const isSelected = key === calSelectedKey;
+    const comp = L[key] ? getCompletion(key, dow) : null;
+
+    let dotHtml = '';
+    if (isEval) dotHtml = `<div class="cal-dot eval"></div>`;
+    else if (comp && comp.total > 0) {
+      const cls = comp.pct >= 80 ? 'full' : comp.pct >= 40 ? 'part' : 'low';
+      dotHtml = `<div class="cal-dot ${cls}"></div>`;
+    }
+
+    html += `<div class="cal-day ${isToday?'today':''} ${isEval?'eval-day':''}"
+      style="${isSelected?'background:#ffe4d4;border-color:var(--orange)':''}"
+      onclick="calSelectDay('${key}')">
+      ${day}${dotHtml}
+    </div>`;
+  }
+  grid.innerHTML = html;
+
+  if (calSelectedKey) renderCalDetail(calSelectedKey);
+}
+
+function renderCalDetail(key) {
+  const d = parseDate(key);
+  const dow = d.getDay();
+  const log = getLog(key);
+  const info = getDayInfo(dow);
+  const comp = getCompletion(key, dow);
+  const exids = getAllExids(dow);
+
+  let html = `<div class="cal-detail">
+    <div class="cal-detail-ttl">${fmtDate(d)} — ${info.label}</div>`;
+
+  if (isEvalDay(key)) {
+    html += `<div style="color:var(--orange);font-weight:700;font-size:13px;margin-bottom:8px">📊 評価日</div>`;
+  }
+
+  // completion
+  html += `<div style="font-size:13px;color:var(--text2);margin-bottom:8px">
+    達成：${comp.done}/${comp.total}種目（${comp.pct}%）
+  </div>`;
+
+  // exercise check
+  if (exids.length > 0) {
+    html += `<div style="margin-bottom:10px">`;
+    for (const id of exids) {
+      const ex = getExercise(id);
+      const done = log.done && log.done[id];
+      html += `<div style="display:flex;align-items:center;gap:8px;padding:4px 0;font-size:13px;border-bottom:1px solid #f0f0f0">
+        <span style="color:${done?'var(--green)':'var(--border)'};font-size:16px">${done?'✓':'○'}</span>
+        <span>${ex.name}</span>
+      </div>`;
+    }
+    html += `</div>`;
+  }
+
+  // metrics
+  const metrics = [];
+  if (log.weight) metrics.push(`体重 ${log.weight}kg`);
+  if (log.finger) {
+    const fl = { good:'良好😊', ok:'普通😐', tight:'張り😬', pain:'痛み🚨' };
+    metrics.push(`指: ${fl[log.finger] || log.finger}`);
+  }
+  if (log.rpe) metrics.push(`RPE ${log.rpe}`);
+  if (log.sleep) metrics.push(`睡眠 ${log.sleep}h`);
+  if (metrics.length) {
+    html += `<div style="font-size:12px;color:var(--text2);display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px">
+      ${metrics.map(m => `<span style="background:#f0f0f0;padding:3px 8px;border-radius:12px">${m}</span>`).join('')}
+    </div>`;
+  }
+  if (log.note) {
+    html += `<div style="font-size:13px;color:var(--text2);font-style:italic">"${log.note}"</div>`;
+  }
+
+  html += `</div>`;
+  document.getElementById('cal-detail').innerHTML = html;
+}
+
+function renderProgress() {
+  const phase = getPhase();
+  const phaseInfo = PHASE_KPIS[phase-1];
+  const streak = calcStreak();
+
+  // Weekly stats (last 7 days)
+  let weekDone = 0, weekTotal = 0;
+  for (let i = 6; i >= 0; i--) {
+    const d = addDays(new Date(), -i);
+    const key = dk(d);
+    const comp = getCompletion(key, d.getDay());
+    weekDone += comp.done;
+    weekTotal += comp.total;
+  }
+  const weekPct = weekTotal ? Math.round(weekDone/weekTotal*100) : 0;
+
+  // Monthly stats (this month)
+  const now = new Date();
+  const firstOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  let monDone = 0, monTotal = 0;
+  const d2 = new Date(firstOfMonth);
+  while (d2 <= now) {
+    const key = dk(d2);
+    const comp = getCompletion(key, d2.getDay());
+    monDone += comp.done;
+    monTotal += comp.total;
+    d2.setDate(d2.getDate()+1);
+  }
+  const monPct = monTotal ? Math.round(monDone/monTotal*100) : 0;
+
+  // Weight history (last 14 days with data)
+  const weightHistory = [];
+  for (let i = 13; i >= 0; i--) {
+    const d = addDays(new Date(), -i);
+    const key = dk(d);
+    const log = getLog(key);
+    if (log.weight) weightHistory.push({ label: `${d.getMonth()+1}/${d.getDate()}`, val: log.weight });
+  }
+
+  let html = '';
+
+  // Streak + phase header
+  html += `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+    <div class="streak-badge">🔥 ${streak}日連続</div>
+    <div style="font-size:12px;color:var(--text2)">プログラム開始：${S.startDate || '未設定'}</div>
+  </div>`;
+
+  // Stats grid
+  html += `<div class="statcard">
+    <div class="statcard-ttl">📈 達成率サマリー</div>
+    <div class="stat-grid">
+      <div class="stat-item"><div class="stat-val">${weekPct}%</div><div class="stat-lbl">今週</div></div>
+      <div class="stat-item"><div class="stat-val">${monPct}%</div><div class="stat-lbl">今月</div></div>
+      <div class="stat-item"><div class="stat-val">${weekDone}</div><div class="stat-lbl">今週の種目数</div></div>
+      <div class="stat-item"><div class="stat-val">${streak}</div><div class="stat-lbl">連続日数</div></div>
+    </div>
+  </div>`;
+
+  // Phase KPIs
+  html += `<div class="statcard">
+    <div class="statcard-ttl" style="color:${phaseInfo.color}">🎯 ${phaseInfo.label} — KPI目標</div>`;
+  for (const kpi of phaseInfo.kpis) {
+    html += `<div class="kpi-item">
+      <span class="kpi-lbl">${kpi.label}</span>
+      <span class="kpi-tgt">${kpi.target}</span>
+    </div>`;
+  }
+  html += `</div>`;
+
+  // Weight chart
+  html += `<div class="statcard">
+    <div class="statcard-ttl">⚖️ 体重推移（目標：60 kg）</div>`;
+  if (weightHistory.length === 0) {
+    html += `<div class="wchart-empty">体重データがありません<br>「今日」タブから記録してください</div>`;
+  } else {
+    const vals = weightHistory.map(w => w.val);
+    const maxW = Math.max(...vals, 66);
+    const minW = Math.min(...vals, 59);
+    const range = maxW - minW || 1;
+    html += `<div style="position:relative;height:100px;margin:8px 0 4px">
+      <div style="position:absolute;top:0;right:0;left:0;height:1px;background:#ddd"></div>
+      <div style="position:absolute;left:0;right:0;font-size:10px;color:var(--text2);top:-14px;text-align:right">${maxW}kg</div>`;
+    // Target line at 60kg
+    const targetPct = (maxW - 60) / range * 100;
+    if (targetPct >= 0 && targetPct <= 100) {
+      html += `<div style="position:absolute;left:0;right:0;top:${targetPct}%;border-top:2px dashed var(--green);opacity:.7"></div>
+      <div style="position:absolute;right:0;top:${targetPct}%;font-size:9px;color:var(--green);transform:translateY(-12px)">目標60kg</div>`;
+    }
+    html += `<div style="display:flex;align-items:flex-end;height:100%;gap:3px;padding-top:4px">`;
+    for (const w of weightHistory) {
+      const h = Math.max(4, Math.round((w.val - minW) / range * 80 + 10));
+      html += `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;justify-content:flex-end">
+        <div style="font-size:8px;color:var(--text2)">${w.val}</div>
+        <div style="width:100%;height:${h}px;background:var(--orange);border-radius:2px 2px 0 0;min-height:4px"></div>
+        <div style="font-size:7px;color:var(--text2);white-space:nowrap">${w.label}</div>
+      </div>`;
+    }
+    html += `</div></div>`;
+  }
+  html += `</div>`;
+
+  // Evaluation dates
+  html += `<div class="statcard">
+    <div class="statcard-ttl">📅 評価日</div>`;
+  if (S.evalDates) {
+    S.evalDates.forEach((d, i) => {
+      if (!d) return;
+      const evDate = parseDate(d);
+      const now2 = new Date(); now2.setHours(0,0,0,0);
+      const diff = Math.round((evDate - now2) / 86400000);
+      const phaseKpi = PHASE_KPIS[i];
+      html += `<div class="kpi-item">
+        <div>
+          <div class="kpi-lbl">Month ${i+1} 評価日</div>
+          <div class="kpi-current" style="font-size:11px;color:var(--text2)">${d}</div>
+        </div>
+        <div class="kpi-tgt">${diff >= 0 ? `あと${diff}日` : `${Math.abs(diff)}日経過`}</div>
+      </div>`;
+    });
+  }
+  html += `</div>`;
+
+  document.getElementById('prog-content').innerHTML = html;
+}
+
+function renderSettings() {
+  const sched = (S && S.schedule) ? S.schedule : DEFAULT_SCHEDULE;
+  const daily = (S && S.dailyExids) ? S.dailyExids : DEFAULT_DAILY;
+  const activeDow = S._settingsDow !== undefined ? S._settingsDow : 0;
+
+  let html = '';
+
+  // Basic settings
+  html += `<div class="set-section">
+    <div class="set-section-ttl">プログラム設定</div>
+    <div class="set-row">
+      <div><div class="set-lbl">名前</div></div>
+      <input class="set-inp" type="text" value="${S.name||''}"
+        onchange="updateSetting('name',this.value)">
+    </div>
+    <div class="set-row">
+      <div><div class="set-lbl">開始日</div></div>
+      <input class="set-inp" type="date" value="${S.startDate||''}"
+        onchange="updateSetting('startDate',this.value)">
+    </div>
+    <div class="set-row">
+      <div><div class="set-lbl">評価日 Month 1</div></div>
+      <input class="set-inp" type="date" value="${(S.evalDates&&S.evalDates[0])||''}"
+        onchange="updateEvalDate(0,this.value)">
+    </div>
+    <div class="set-row">
+      <div><div class="set-lbl">評価日 Month 2</div></div>
+      <input class="set-inp" type="date" value="${(S.evalDates&&S.evalDates[1])||''}"
+        onchange="updateEvalDate(1,this.value)">
+    </div>
+    <div class="set-row">
+      <div><div class="set-lbl">評価日 Month 3</div></div>
+      <input class="set-inp" type="date" value="${(S.evalDates&&S.evalDates[2])||''}"
+        onchange="updateEvalDate(2,this.value)">
+    </div>
+  </div>`;
+
+  // Weekly schedule editor
+  html += `<div class="set-section">
+    <div class="set-section-ttl">週間メニュー設定</div>
+    <div class="dow-tabs">`;
+  for (let i = 0; i < 7; i++) {
+    const info = sched[i];
+    const typeColor = info.type === 'climbing' ? '#c05000' : info.type === 'strength' ? '#1a6ea8' : '#555';
+    html += `<button class="dow-tab ${activeDow===i?'on':''}"
+      onclick="selectDow(${i})" style="${activeDow===i?'':'border-left:3px solid '+typeColor}">
+      ${DOW_LABEL[i]}
+    </button>`;
+  }
+  html += `</div>`;
+
+  // Current day info
+  const dayInfo = sched[activeDow];
+  const allIds = getAllExids(activeDow);
+  html += `<div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:8px">
+    ${dayInfo.label} — ${dayInfo.sub}
+  </div>`;
+
+  // Exercises in this day
+  for (const id of allIds) {
+    const ex = getExercise(id);
+    const isDaily = daily.includes(id);
+    html += `<div class="sched-item">
+      <div class="sched-item-info">
+        <div class="sched-item-nm">${ex.name} ${isDaily ? '<span style="font-size:10px;color:var(--text2)">[毎日]</span>' : ''}</div>
+        <div class="sched-item-pm">${ex.params}</div>
+      </div>
+      <button class="sched-del" onclick="removeExFromDay(${activeDow},'${id}')" title="削除">×</button>
+    </div>`;
+  }
+
+  html += `<button class="sched-add" onclick="openAddEx(${activeDow})">＋ 種目を追加</button>`;
+  html += `</div>`;
+
+  // Daily care section
+  html += `<div class="set-section">
+    <div class="set-section-ttl">毎日ケア（全日共通）</div>`;
+  for (const id of daily) {
+    const ex = getExercise(id);
+    html += `<div class="sched-item">
+      <div class="sched-item-info">
+        <div class="sched-item-nm">${ex.name}</div>
+        <div class="sched-item-pm">${ex.params}</div>
+      </div>
+      <button class="sched-del" onclick="removeDailyEx('${id}')">×</button>
+    </div>`;
+  }
+  html += `<button class="sched-add" onclick="openAddEx('daily')">＋ 毎日ケア種目を追加</button>
+  </div>`;
+
+  // Data management
+  html += `<div class="set-section">
+    <div class="set-section-ttl">データ管理</div>
+    <button class="danger-btn" onclick="resetSchedule()">スケジュールをデフォルトに戻す</button>
+    <button class="danger-btn" style="border-color:#aaa;color:#aaa;margin-top:6px" onclick="exportData()">データをエクスポート（JSON）</button>
+  </div>`;
+
+  document.getElementById('set-content').innerHTML = html;
+}
+
+// ══════════════════════════════════════════
+//  EVENTS
+// ══════════════════════════════════════════
+function switchTab(t) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nbtn').forEach(b => b.classList.remove('on'));
+  document.getElementById('tab-' + t).classList.add('active');
+  document.getElementById('nbtn-' + t).classList.add('on');
+  if (t === 'today') renderToday();
+  if (t === 'cal') { calDate = new Date(); renderCalendar(); }
+  if (t === 'prog') renderProgress();
+  if (t === 'set') renderSettings();
+}
+
+function toggleEx(key, exid) {
+  const log = getLog(key);
+  if (!log.done) log.done = {};
+  log.done[exid] = !log.done[exid];
+  saveLog(key, log);
+  renderToday();
+  if (log.done[exid]) showToast('✓ 完了！');
+}
+
+function setFinger(key, val) {
+  const log = getLog(key);
+  log.finger = log.finger === val ? null : val;
+  saveLog(key, log);
+  renderToday();
+}
+
+function setLogField(key, field, val) {
+  const log = getLog(key);
+  log[field] = val;
+  saveLog(key, log);
+}
+
+function calPrev() { calDate.setMonth(calDate.getMonth()-1); calSelectedKey = null; document.getElementById('cal-detail').innerHTML = ''; renderCalendar(); }
+function calNext() { calDate.setMonth(calDate.getMonth()+1); calSelectedKey = null; document.getElementById('cal-detail').innerHTML = ''; renderCalendar(); }
+
+function calSelectDay(key) {
+  calSelectedKey = calSelectedKey === key ? null : key;
+  renderCalendar();
+  if (!calSelectedKey) document.getElementById('cal-detail').innerHTML = '';
+}
+
+function updateSetting(field, val) {
+  S[field] = val;
+  saveSettings();
+  renderHeader();
+  showToast('保存しました');
+}
+
+function updateEvalDate(idx, val) {
+  if (!S.evalDates) S.evalDates = [null,null,null];
+  S.evalDates[idx] = val;
+  saveSettings();
+  renderHeader();
+  showToast('評価日を保存しました');
+}
+
+function selectDow(dow) {
+  S._settingsDow = dow;
+  renderSettings();
+}
+
+function removeExFromDay(dow, exid) {
+  if (!S.schedule) S.schedule = JSON.parse(JSON.stringify(DEFAULT_SCHEDULE));
+  const idx = S.schedule[dow].exids.indexOf(exid);
+  if (idx !== -1) S.schedule[dow].exids.splice(idx, 1);
+  saveSettings();
+  renderSettings();
+  showToast('削除しました');
+}
+
+function removeDailyEx(exid) {
+  if (!S.dailyExids) S.dailyExids = [...DEFAULT_DAILY];
+  const idx = S.dailyExids.indexOf(exid);
+  if (idx !== -1) S.dailyExids.splice(idx, 1);
+  saveSettings();
+  renderSettings();
+  showToast('削除しました');
+}
+
+function openAddEx(dow) {
+  addExTargetDow = dow;
+  document.getElementById('exSearch').value = '';
+  document.getElementById('cust-name').value = '';
+  document.getElementById('cust-params').value = '';
+  document.getElementById('cust-detail').value = '';
+  document.getElementById('cust-cat').value = 'custom';
+  renderExList();
+  document.getElementById('addExModal').classList.remove('hidden');
+}
+
+function closeAddEx() {
+  document.getElementById('addExModal').classList.add('hidden');
+  addExTargetDow = null;
+}
+
+function renderExList() {
+  const query = document.getElementById('exSearch').value.toLowerCase();
+  const sched = (S && S.schedule) ? S.schedule : DEFAULT_SCHEDULE;
+  const daily = (S && S.dailyExids) ? S.dailyExids : DEFAULT_DAILY;
+
+  // Get currently added ids for this day
+  let currentIds = [];
+  if (addExTargetDow === 'daily') {
+    currentIds = daily;
+  } else if (addExTargetDow !== null) {
+    currentIds = [...sched[addExTargetDow].exids, ...daily];
+  }
+
+  const all = { ...EXERCISES_MASTER };
+  if (S && S.customExercises) Object.assign(all, S.customExercises);
+
+  let html = '';
+  for (const [id, ex] of Object.entries(all)) {
+    if (query && !ex.name.toLowerCase().includes(query)) continue;
+    const inUse = currentIds.includes(id);
+    html += `<div class="ex-list-item" onclick="${inUse ? '' : `addExToDay('${id}')`}">
+      <div>
+        <div style="font-size:13px;font-weight:700">${ex.name}</div>
+        <div style="font-size:11px;color:var(--text2)">${ex.params}</div>
+      </div>
+      <button class="ex-add-btn" style="${inUse ? 'background:#eee;color:#bbb;cursor:not-allowed' : ''}">
+        ${inUse ? '✓' : '+'}
+      </button>
+    </div>`;
+  }
+  if (!html) html = '<div style="text-align:center;color:var(--text2);padding:20px;font-size:13px">該当なし</div>';
+  document.getElementById('exListArea').innerHTML = html;
+}
+
+function addExToDay(exid) {
+  if (addExTargetDow === 'daily') {
+    if (!S.dailyExids) S.dailyExids = [...DEFAULT_DAILY];
+    if (!S.dailyExids.includes(exid)) S.dailyExids.push(exid);
+  } else {
+    if (!S.schedule) S.schedule = JSON.parse(JSON.stringify(DEFAULT_SCHEDULE));
+    if (!S.schedule[addExTargetDow].exids.includes(exid)) {
+      S.schedule[addExTargetDow].exids.push(exid);
+    }
+  }
+  saveSettings();
+  renderExList();
+  showToast('追加しました');
+}
+
+function addCustomExercise() {
+  const name = document.getElementById('cust-name').value.trim();
+  const params = document.getElementById('cust-params').value.trim();
+  const detail = document.getElementById('cust-detail').value.trim();
+  if (!name) { showToast('種目名を入力してください'); return; }
+
+  if (!S.customExercises) S.customExercises = {};
+  const cat = document.getElementById('cust-cat').value || 'custom';
+  const id = 'custom_' + Date.now();
+  S.customExercises[id] = { name, params, detail, cat };
+  saveSettings();
+
+  if (addExTargetDow === 'daily') {
+    if (!S.dailyExids) S.dailyExids = [...DEFAULT_DAILY];
+    S.dailyExids.push(id);
+  } else if (addExTargetDow !== null) {
+    if (!S.schedule) S.schedule = JSON.parse(JSON.stringify(DEFAULT_SCHEDULE));
+    S.schedule[addExTargetDow].exids.push(id);
+  }
+  saveSettings();
+  closeAddEx();
+  renderSettings();
+  showToast(`「${name}」を追加しました`);
+}
+
+function resetSchedule() {
+  if (!confirm('スケジュールをデフォルトに戻しますか？\nカスタム種目は削除されません。')) return;
+  S.schedule = JSON.parse(JSON.stringify(DEFAULT_SCHEDULE));
+  S.dailyExids = [...DEFAULT_DAILY];
+  saveSettings();
+  renderSettings();
+  showToast('デフォルトに戻しました');
+}
+
+function exportData() {
+  const data = JSON.stringify({ settings: S, logs: L }, null, 2);
+  const blob = new Blob([data], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `v8_training_${todayKey()}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+let toastTimer = null;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+// ══════════════════════════════════════════
+//  SETUP
+// ══════════════════════════════════════════
+function setupSave() {
+  const name = document.getElementById('su-name').value.trim() || '鈴木達也';
+  const start = document.getElementById('su-start').value;
+  const ev1 = document.getElementById('su-ev1').value;
+  const ev2 = document.getElementById('su-ev2').value;
+  const ev3 = document.getElementById('su-ev3').value;
+  if (!start) { showToast('開始日を入力してください'); return; }
+  S = {
+    name,
+    startDate: start,
+    evalDates: [ev1||null, ev2||null, ev3||null],
+    schedule: JSON.parse(JSON.stringify(DEFAULT_SCHEDULE)),
+    dailyExids: [...DEFAULT_DAILY],
+    customExercises: {},
+  };
+  saveSettings();
+  document.getElementById('setupModal').classList.add('hidden');
+  renderHeader();
+  renderToday();
+}
+
+// ══════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════
+function initSetupDefaults() {
+  const today = new Date();
+  const fmt = (d) => dk(d);
+  document.getElementById('su-start').value = fmt(today);
+  document.getElementById('su-ev1').value = fmt(addDays(today, 30));
+  document.getElementById('su-ev2').value = fmt(addDays(today, 60));
+  document.getElementById('su-ev3').value = fmt(addDays(today, 90));
+}
+
+function init() {
+  loadState();
+  if (!S) {
+    initSetupDefaults();
+    document.getElementById('setupModal').classList.remove('hidden');
+  } else {
+    document.getElementById('setupModal').classList.add('hidden');
+    renderHeader();
+    renderToday();
+  }
+  // Close add ex modal on overlay click
+  document.getElementById('addExModal').addEventListener('click', function(e) {
+    if (e.target === this) closeAddEx();
+  });
+}
+
+document.addEventListener('DOMContentLoaded', init);
+
+// Service Worker
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js').catch(() => {});
+}
+</script>
+</body>
+</html>
