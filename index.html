@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>V8 Training Tracker</title>
+<title>クライミング トレーニング</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#ff7a3d">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -360,7 +360,159 @@ body{
   display:flex;align-items:center;gap:8px;
 }
 .sec-ttl-line{flex:1;height:1px;background:var(--border)}
+
+/* ══════════════════════════════════════════
+   チェックタブ（フィジカルチェック）CSS
+   ══════════════════════════════════════════ */
+
+    :root {
+      --primary: #2e4057;
+      --accent: #4a7fcb;
+      --good: #2e7d32;
+      --warn: #e65100;
+      --bad: #c62828;
+      --bg: #f0f2f7;
+      --card: #fff;
+      --border: #dde1ea;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    .ca-screen { display: none; }
+    .ca-screen.active { display: block; }
+
+    /* ── ヘッダー ── */
+    .ca-header {
+      background: var(--primary); color: #fff;
+      padding: 12px 14px; display: flex; align-items: center; gap: 8px;
+      position: sticky; top: 0; z-index: 100;
+    }
+    .ca-header h1 { font-size: 18px; flex: 1; }
+    .ca-btn-icon { background: none; border: none; color: #fff; font-size: 22px; cursor: pointer; padding: 4px 6px; }
+
+    /* ── ボタン ── */
+    .ca-btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+      padding: 13px 20px; border-radius: 8px; font-size: 17px; font-weight: bold;
+      cursor: pointer; border: none; text-decoration: none; -webkit-tap-highlight-color: transparent;
+    }
+    .ca-btn-primary { background: var(--primary); color: #fff; }
+    .ca-btn-accent  { background: var(--accent);  color: #fff; }
+    .ca-btn-outline { background: #fff; color: var(--primary); border: 2px solid var(--primary); }
+    .ca-btn-block   { width: 100%; }
+
+    /* ── カード ── */
+    .ca-card { background: var(--card); border-radius: 10px; border: 1px solid var(--border); margin: 10px 12px; overflow: hidden; }
+    .ca-card-header { background: var(--primary); color: #fff; font-weight: bold; font-size: 15px; padding: 9px 14px; }
+    .ca-card-
+
+    /* ── フォーム ── */
+    .ca-form-group { margin-bottom: 12px; }
+    .ca-form-label { font-size: 14px; color: #666; margin-bottom: 3px; display: block; }
+    .ca-form-input, .ca-form-select {
+      width: 100%; padding: 10px 12px; border: 1.5px solid var(--border);
+      border-radius: 6px; font-size: 16px; background: #fffde7;
+    }
+    .ca-form-input:focus, .ca-form-select:focus { outline: none; border-color: var(--accent); }
+    .ca-form-row { display: flex; gap: 10px; }
+    .ca-form-row .ca-form-group { flex: 1; }
+
+    /* ── 試技入力 ── */
+    .ca-trial-grid { display: grid; grid-template-columns: 28px 1fr 24px 1fr 28px; align-items: center; gap: 4px; margin-bottom: 6px; }
+    .ca-t-label { font-size: 12px; color: #666; text-align: center; }
+    .ca-t-side  { font-weight: bold; font-size: 13px; }
+    .ca-t-unit  { font-size: 11px; color: #888; }
+    .ca-trial-input {
+      padding: 10px 6px; border: 1.5px solid var(--border); border-radius: 6px;
+      font-size: 16px; text-align: center; background: #fffde7; width: 100%;
+    }
+    .ca-trial-input:focus { outline: none; border-color: var(--accent); }
+
+    /* ── ホーム ── */
+    .ca-home-hero { background: var(--primary); color: #fff; padding: 20px 16px; text-align: center; }
+    .ca-home-hero h2 { font-size: 19px; margin-bottom: 4px; }
+    .ca-home-hero p  { font-size: 12px; opacity: 0.8; }
+    .ca-section-label { padding: 10px 14px 4px; font-size: 11px; color: #888; font-weight: bold; letter-spacing: 0.5px; text-transform: uppercase; }
+    .ca-record-list { padding: 0 12px 80px; }
+    .ca-record-item {
+      background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+      padding: 14px; margin-bottom: 10px; cursor: pointer; display: flex; align-items: center; gap: 12px;
+    }
+    .ca-record-icon { width: 42px; height: 42px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 20px; flex-shrink: 0; }
+    .ca-record-name { font-weight: bold; font-size: 15px; }
+    .ca-record-date { font-size: 12px; color: #888; }
+    .ca-record-info { font-size: 12px; color: #888; }
+    .ca-empty-state { text-align: center; padding: 50px 20px; color: #999; }
+    .ca-empty-icon  { font-size: 52px; margin-bottom: 12px; }
+    .ca-fab { position: fixed; bottom: 24px; right: 18px; width: 58px; height: 58px; border-radius: 29px; background: var(--accent); color: #fff; font-size: 30px; display: flex; align-items: center; justify-content: center; border: none; cursor: pointer; box-shadow: 0 4px 14px rgba(0,0,0,0.3); z-index: 50; }
+
+    /* ── モーダル ── */
+    .ca-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; align-items: flex-end; }
+    .ca-modal-overlay.open { display: flex; }
+    .ca-modal-sheet { background: #fff; border-radius: 16px 16px 0 0; padding: 20px 16px 32px; width: 100%; }
+    .ca-modal-title { font-weight: bold; font-size: 16px; margin-bottom: 14px; }
+
+    /* ── ラジオ ── */
+    .ca-radio-group { display: flex; gap: 8px; flex-wrap: wrap; }
+    .ca-radio-btn { display: flex; align-items: center; gap: 4px; padding: 8px 14px; border: 1.5px solid var(--border); border-radius: 20px; cursor: pointer; font-size: 13px; }
+    .ca-radio-btn.checked { border-color: var(--accent); background: #e8f0fe; color: var(--accent); font-weight: bold; }
+
+    /* ── 結果画面 ── */
+    .ca-result-profile { background: var(--primary); color: #fff; padding: 14px 16px; }
+    .ca-result-name { font-size: 20px; font-weight: bold; }
+    .ca-result-meta { font-size: 12px; opacity: 0.85; margin-top: 3px; }
+    .ca-chart-wrap { background: var(--card); margin: 10px 12px; border-radius: 10px; border: 1px solid var(--border); padding: 12px; text-align: center; }
+    .ca-chart-wrap canvas { max-width: 320px; margin: 0 auto; display: block; }
+    .ca-compare-bar { margin: 0 12px 8px; display: flex; align-items: center; gap: 8px; }
+    .ca-compare-bar label { font-size: 12px; color: #888; flex-shrink: 0; }
+    .ca-compare-bar select { flex: 1; padding: 7px 10px; border: 1.5px solid var(--border); border-radius: 6px; font-size: 13px; }
+    .ca-summary-box { margin: 0 12px 10px; background: var(--card); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; display: flex; }
+    .ca-summary-half { flex: 1; padding: 12px 10px; }
+    .ca-summary-half:first-child { border-right: 1px solid var(--border); }
+    .ca-summary-title { font-size: 12px; font-weight: bold; margin-bottom: 6px; }
+    .ca-summary-title.good { color: var(--good); }
+    .ca-summary-title.weak { color: var(--bad); }
+    .ca-summary-item { font-size: 12px; color: #666; line-height: 1.6; }
+    .ca-diff-note { margin: 0 12px 10px; background: #fff3e0; border-left: 3px solid #e65100; padding: 8px 12px; border-radius: 0 6px 6px 0; font-size: 12px; color: #555; }
+    .ca-cond-note { margin: 8px 12px 0; background: #fff8e1; border-left: 3px solid #f9a825; padding: 8px 12px; border-radius: 0 6px 6px 0; font-size: 12px; color: #555; }
+    .ca-eval-table { width: 100%; border-collapse: collapse; font-size: 15px; }
+    .ca-eval-table th { background: var(--primary); color: #fff; padding: 8px 6px; text-align: center; }
+    .ca-eval-table td { border: 1px solid #eee; padding: 8px 6px; vertical-align: top; }
+    .ca-eval-table tr:nth-child(even) td { background: #fafafa; }
+    .ca-badge { display: inline-block; padding: 3px 9px; border-radius: 10px; font-size: 12px; font-weight: bold; white-space: nowrap; }
+    .ca-badge-ex { background: #c8e6c9; color: #1b5e20; }
+    .ca-badge-gd { background: #dcedc8; color: #33691e; }
+    .ca-badge-av { background: #f5f5f5; color: #555; border: 1px solid #ccc; }
+    .ca-badge-lo { background: #ffe0b2; color: #bf360c; }
+    .ca-badge-po { background: #ffcdd2; color: #b71c1c; }
+    .ca-badge-na { background: #eee; color: #888; }
+    .ca-action-area { padding: 12px; display: flex; flex-direction: column; gap: 10px; padding-bottom: 30px; }
+
+    .ca-pb-safe { padding-bottom: 80px; }
+    .ca-mt-8 { margin-top: 8px; }
+    .ca-gap-8 { gap: 8px; }
+
+    .ca-form-step { display: none; }
+    .ca-form-step.active { display: block; }
+    .ca-step-progress { height: 4px; background: #dde1ea; }
+    .ca-step-progress-bar { height: 100%; background: #4a7fcb; transition: width 0.3s; }
+    .ca-step-info { padding: 8px 14px 10px; background: #fff; border-bottom: 1px solid #dde1ea; }
+    .ca-step-counter { font-size: 12px; color: #888; }
+    .ca-step-title { font-size: 17px; font-weight: bold; color: #2e4057; margin-top: 2px; }
+    .ca-step-instr { background: #e8f4fd; border-left: 4px solid #4a7fcb; padding: 12px 14px; border-radius: 0 8px 8px 0; margin: 0 12px 12px; font-size: 13px; line-height: 1.8; color: #333; }
+    .ca-step-instr b { color: #1a3a6b; }
+    .ca-step-nav { display: flex; gap: 10px; padding: 12px 12px 32px; }
+  
+/* チェックタブ固有設定 */
+#tab-check { padding: 0; }
+#tab-check .ca-screen { display: none; }
+#tab-check .ca-screen.active { display: block; }
+#tab-check .ca-header { position: sticky; top: 0; z-index: 30; background: #2e4057; color: #fff; padding: 12px 14px; display: flex; align-items: center; gap: 8px; }
+#tab-check .ca-header h1 { font-size: 18px; flex: 1; }
+#tab-check .ca-fab { position: fixed; bottom: calc(64px + 16px); right: 18px; }
+.ca-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; align-items: flex-end; }
+.ca-modal-overlay.open { display: flex; }
 </style>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
 
@@ -485,6 +637,647 @@ body{
     <div id="prog-content"></div>
   </div>
 
+
+  <!-- Tab: フィジカルチェック -->
+  <div id="tab-check" class="panel">
+<!-- ================================================================
+     ホーム画面
+     ================================================================ -->
+<div id="ca-screen-home" class="ca-screen active">
+  <div class="ca-header">
+    <h1>🧗 クライミング フィジカルチェック</h1>
+    <button class="ca-btn-icon" onclick="CA_openModal('ca-modal-menu')" title="メニュー">⋯</button>
+  </div>
+  <div class="ca-home-hero">
+    <h2>フィジカル評価アプリ</h2>
+    <p>測定値を入力してレーダーチャートで確認・比較</p>
+  </div>
+  <div class="ca-section-label">過去の記録</div>
+  <div class="ca-record-list" id="ca-record-list"></div>
+  <button class="ca-fab" onclick="CA_startNew()">＋</button>
+
+  <!-- メニューモーダル -->
+  <div id="ca-modal-menu" class="ca-modal-overlay" onclick="CA_closeModal('ca-modal-menu')">
+    <div class="ca-modal-sheet" onclick="event.stopPropagation()">
+      <div class="ca-modal-title">メニュー</div>
+      <button class="ca-btn ca-btn-outline ca-btn-block" onclick="CA_doExport()">📤 バックアップ（JSONエクスポート）</button>
+      <div style="height:10px;"></div>
+      <button class="ca-btn ca-btn-outline ca-btn-block" onclick="document.getElementById('ca-import-file').click()">📥 バックアップから復元（JSONインポート）</button>
+      <input type="file" id="ca-import-file" accept=".json" style="display:none" onchange="CA_doImport(event)">
+      <div style="height:10px;"></div>
+      <button class="ca-btn ca-btn-outline ca-btn-block" onclick="CA_closeModal('ca-modal-menu')">閉じる</button>
+    </div>
+  </div>
+</div>
+
+  <!-- AIプロンプト生成モーダル -->
+  <div id="ca-modal-prompt" class="ca-modal-overlay" onclick="CA_closeModal('ca-modal-prompt')">
+    <div class="ca-modal-sheet" onclick="event.stopPropagation()" style="max-height:90vh;overflow-y:auto;">
+      <div class="ca-modal-title">🤖 AIトレーニングプログラム生成</div>
+      <div style="font-size:13px;color:#555;margin-bottom:14px;">目標グレードと期間を入力してプロンプトを生成。ClaudeやChatGPTに貼り付けるだけで個別プログラムが作成されます。</div>
+      <div class="ca-form-row" style="margin-bottom:12px;">
+        <div class="ca-form-group">
+          <label class="ca-form-label">目標グレード（ボルダー）</label>
+          <input class="ca-form-input" id="ca-pm-target-grade" type="text" placeholder="V8（初段）">
+        </div>
+        <div class="ca-form-group">
+          <label class="ca-form-label">トレーニング期間</label>
+          <input class="ca-form-input" id="ca-pm-duration" type="text" placeholder="3ヶ月">
+        </div>
+      </div>
+      <div class="ca-form-group" style="margin-bottom:12px;">
+        <label class="ca-form-label">目標体重（kg）</label>
+        <input class="ca-form-input" id="ca-pm-target-weight" type="number" placeholder="例：63" step="0.1" min="30" max="150">
+      </div>
+      <div class="ca-form-group" style="margin-bottom:14px;">
+        <label class="ca-form-label">週のクライミング頻度</label>
+        <select class="ca-form-select" id="ca-pm-freq">
+          <option value="週1〜2回">週1〜2回</option>
+          <option value="週2〜3回" selected>週2〜3回</option>
+          <option value="週3〜4回">週3〜4回</option>
+          <option value="週4回以上">週4回以上</option>
+        </select>
+      </div>
+      <div class="ca-form-group" style="margin-bottom:16px;">
+        <label class="ca-form-label">その他・特記事項（任意）</label>
+        <input class="ca-form-input" id="ca-pm-notes" type="text" placeholder="例：腰痛持ち、ジムのみ">
+      </div>
+      <button class="ca-btn ca-btn-accent ca-btn-block" onclick="CA_generatePrompt()" style="margin-bottom:10px;">プロンプトを生成</button>
+      <div id="ca-pm-result" style="display:none;">
+        <div style="font-size:13px;font-weight:bold;margin-bottom:6px;color:#1a3a6b;">生成されたプロンプト</div>
+        <textarea id="ca-pm-text" style="width:100%;height:220px;font-size:12px;padding:10px;border:1.5px solid #dde1ea;border-radius:8px;resize:vertical;background:#f8f9ff;" readonly></textarea>
+        <button class="ca-btn ca-btn-outline ca-btn-block" onclick="CA_copyPrompt()" style="margin-top:8px;">📋　コピーする</button>
+        <div id="ca-pm-copy-ok" style="display:none;text-align:center;color:#2e7d32;font-size:13px;margin-top:6px;">コピーしました！</div>
+      </div>
+      <button class="ca-btn ca-btn-outline ca-btn-block" onclick="CA_closeModal('ca-modal-prompt')" style="margin-top:10px;">閉じる</button>
+    </div>
+  </div>
+
+<!-- ================================================================
+     入力フォーム画面
+     ================================================================ -->
+<div id="ca-screen-form" class="ca-screen">
+  <div class="ca-header">
+    <button class="ca-btn-icon" onclick="CA_showScreen('home')">←</button>
+    <h1 id="ca-form-screen-title">測定データ入力</h1>
+  </div>
+  <div class="ca-step-progress"><div class="ca-step-progress-bar" id="ca-step-progress-bar" style="width:10%"></div></div>
+  <div class="ca-step-info">
+    <div class="ca-step-counter" id="ca-step-counter">1 / 10</div>
+    <div class="ca-step-title" id="ca-step-title-text">基本情報</div>
+    <div id="ca-step-jump-bar" style="display:none; margin-top:6px;">
+      <select id="ca-step-jump-select" onchange="CA_goToStep(parseInt(this.value))" style="width:100%; padding:7px 10px; border:1.5px solid #4a7fcb; border-radius:6px; font-size:13px; background:#e8f0fe; color:#1a3a6b;">
+        <option value="1">① 基本情報</option>
+        <option value="2">② 指力MVC</option>
+        <option value="3">③ 指持久力</option>
+        <option value="4">④ 上肢プル</option>
+        <option value="5">⑤ 肩ER/IR筋力</option>
+        <option value="6">⑥ 体幹</option>
+        <option value="7">⑦ AGFR（足挙上高）</option>
+        <option value="8">⑧ Straddle-Stand</option>
+        <option value="9">⑨ 足首背屈（WBLT）</option>
+        <option value="10">⑩ パワースラップ</option>
+      </select>
+    </div>
+  </div>
+  <div class="ca-pb-safe">
+
+  <!-- Step 1: 基本情報 -->
+  <div class="ca-form-step active" id="ca-step-1">
+  <div class="ca-card">
+    <div class="ca-card-header">基本情報</div>
+    <div class="ca-card-body">
+      <div class="ca-form-row">
+        <div class="ca-form-group" style="flex:2;">
+          <label class="ca-form-label">氏名 *</label>
+          <input class="ca-form-input" id="f-name" type="text" placeholder="鈴木 達也">
+        </div>
+        <div class="ca-form-group" style="flex:1;">
+          <label class="ca-form-label">年齢</label>
+          <input class="ca-form-input" id="f-age" type="number" placeholder="30" min="10" max="80">
+        </div>
+      </div>
+      <div class="ca-form-row">
+        <div class="ca-form-group">
+          <label class="ca-form-label">身長 (cm) *</label>
+          <input class="ca-form-input" id="f-height" type="number" placeholder="170" step="0.1">
+        </div>
+        <div class="ca-form-group">
+          <label class="ca-form-label">体重 (kg) *</label>
+          <input class="ca-form-input" id="f-weight" type="number" placeholder="65" step="0.1">
+        </div>
+      </div>
+      <div class="ca-form-row">
+        <div class="ca-form-group">
+          <label class="ca-form-label">性別 *</label>
+          <select class="ca-form-select" id="f-gender">
+            <option value="male">男性</option>
+            <option value="female">女性</option>
+          </select>
+        </div>
+        <div class="ca-form-group">
+          <label class="ca-form-label">利き手</label>
+          <select class="ca-form-select" id="f-dominant">
+            <option value="right">右</option>
+            <option value="left">左</option>
+          </select>
+        </div>
+      </div>
+      <div class="ca-form-row">
+        <div class="ca-form-group">
+          <label class="ca-form-label">測定日</label>
+          <input class="ca-form-input" id="f-date" type="date">
+        </div>
+        <div class="ca-form-group">
+          <label class="ca-form-label">歴 (年)</label>
+          <input class="ca-form-input" id="f-years" type="number" placeholder="5" min="0">
+        </div>
+      </div>
+      <div class="ca-form-row">
+        <div class="ca-form-group">
+          <label class="ca-form-label">B最高グレード</label>
+          <input class="ca-form-input" id="f-grade" type="text" placeholder="V6（初段）">
+        </div>
+      </div>
+      <div class="ca-form-group">
+        <label class="ca-form-label">傷害歴・既往歴</label>
+        <input class="ca-form-input" id="f-injury" type="text" placeholder="特になし">
+      </div>
+      <div class="ca-form-group">
+        <label class="ca-form-label">当日コンディション</label>
+        <div class="ca-radio-group" id="ca-cond-group">
+          <div class="ca-radio-btn" onclick="CA_setCond('good',this)">絶好調</div>
+          <div class="ca-radio-btn checked" onclick="CA_setCond('normal',this)">普通</div>
+          <div class="ca-radio-btn" onclick="CA_setCond('tired',this)">疲労あり</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div><!-- /step-1 -->
+
+  <!-- Step 2: ① 指力MVC -->
+  <div class="ca-form-step" id="ca-step-2">
+  <div class="ca-step-instr">
+  <b>測定方法：片手・直腕・20mmエッジ</b><br>
+  ① ウォームアップ：同エッジで軽くぶら下がり3分<br>
+  ② 肢位：直腕（肩180°）・体幹リラックス・固定なし<br>
+  ③ グリップ：ハーフクリンプ（4指第2関節90°屈曲）<br>
+  ④ 収縮：最大努力で7秒間保持<br>
+  ⑤ 試技間休息：2分以上・2試技の高い方を採用<br>
+  <b>体重計法の場合</b>：体重計に乗った状態でエッジを引き、最小値を記録
+</div>
+  <div class="ca-card">
+    <div class="ca-card-header">① 指力MVC（20mmエッジ・ハーフクリンプ 4指）</div>
+    <div class="ca-card-body">
+      <!-- 測定方法トグル -->
+      <div style="margin-bottom:12px;">
+        <div style="font-size:12px; color:#666; margin-bottom:6px;">測定方法</div>
+        <div class="ca-radio-group">
+          <div class="ca-radio-btn checked" id="ca-fi-method-sensor" onclick="CA_setFiMethod('sensor',this)">プルセンサー（kg入力）</div>
+          <div class="ca-radio-btn" id="ca-fi-method-scale" onclick="CA_setFiMethod('scale',this)">体重計法（kg入力）</div>
+        </div>
+      </div>
+
+      <!-- ── プルセンサー入力 ── -->
+      <div id="ca-fi-sensor-inputs">
+        <div style="background:#e8f0fe; border-radius:8px; padding:10px; margin-bottom:12px;">
+          <div style="font-size:12px; font-weight:bold; color:#1a3a6b; margin-bottom:4px;">★ 片手・直腕（グレード評価用）</div>
+          <div style="font-size:11px; color:#555; margin-bottom:8px;">20mmエッジ・直腕・7秒MVC・プルセンサー。Berta 2025（23mmエッジ）参考値と比較。</div>
+          <div class="ca-trial-grid">
+            <span class="ca-t-side">右</span><span class="ca-t-label">試技①</span><span></span><span class="ca-t-label">試技②</span><span class="ca-t-unit">kg</span>
+          </div>
+          <div class="ca-trial-grid">
+            <span></span>
+            <input class="ca-trial-input" id="f-fi-r1" type="number" placeholder="40" min="0" max="200">
+            <span class="ca-t-label" style="color:#bbb;">—</span>
+            <input class="ca-trial-input" id="f-fi-r2" type="number" placeholder="41" min="0" max="200">
+            <span></span>
+          </div>
+          <div class="ca-trial-grid" style="margin-top:6px;">
+            <span class="ca-t-side">左</span><span class="ca-t-label">試技①</span><span></span><span class="ca-t-label">試技②</span><span class="ca-t-unit">kg</span>
+          </div>
+          <div class="ca-trial-grid">
+            <span></span>
+            <input class="ca-trial-input" id="f-fi-l1" type="number" placeholder="37" min="0" max="200">
+            <span class="ca-t-label" style="color:#bbb;">—</span>
+            <input class="ca-trial-input" id="f-fi-l2" type="number" placeholder="38" min="0" max="200">
+            <span></span>
+          </div>
+        </div>
+        <div style="font-size:12px; font-weight:bold; color:#555; margin-bottom:4px;">リフティングエッジ（下から持ち上げ・トレーニング目安）</div>
+        <div style="font-size:11px; color:#888; margin-bottom:8px;">院内シリアル比較用。グレード評価には使用しない。</div>
+        <div class="ca-trial-grid">
+          <span class="ca-t-side">右</span><span class="ca-t-label">試技①</span><span></span><span class="ca-t-label">試技②</span><span class="ca-t-unit">kg</span>
+        </div>
+        <div class="ca-trial-grid">
+          <span></span>
+          <input class="ca-trial-input" id="f-le-r1" type="number" placeholder="35" min="0" max="200">
+          <span class="ca-t-label" style="color:#bbb;">—</span>
+          <input class="ca-trial-input" id="f-le-r2" type="number" placeholder="36" min="0" max="200">
+          <span></span>
+        </div>
+        <div class="ca-trial-grid" style="margin-top:6px;">
+          <span class="ca-t-side">左</span><span class="ca-t-label">試技①</span><span></span><span class="ca-t-label">試技②</span><span class="ca-t-unit">kg</span>
+        </div>
+        <div class="ca-trial-grid">
+          <span></span>
+          <input class="ca-trial-input" id="f-le-l1" type="number" placeholder="33" min="0" max="200">
+          <span class="ca-t-label" style="color:#bbb;">—</span>
+          <input class="ca-trial-input" id="f-le-l2" type="number" placeholder="34" min="0" max="200">
+          <span></span>
+        </div>
+      </div>
+
+      <!-- ── 体重計法入力 ── -->
+      <div id="ca-fi-scale-inputs" style="display:none;">
+        <div style="background:#fff3e0; border-radius:8px; padding:10px; margin-bottom:12px; font-size:11px; color:#555; line-height:1.7;">
+          <strong style="color:#e65100;">計算式：</strong><br>
+          ハング指力 = （体重 + 追加重量）− 体重計<strong>最小値</strong><br>
+          リフティング指力 = 体重計<strong>最大値</strong> − 体重
+        </div>
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
+          <label style="font-size:13px; color:#555; white-space:nowrap;">追加重量</label>
+          <input class="ca-trial-input" id="f-sc-added" type="number" placeholder="0" min="0" max="100" step="0.1" oninput="updateScaleCalc()" style="max-width:100px;">
+          <span style="font-size:13px; color:#888;">kg（なければ0）</span>
+        </div>
+
+        <div style="background:#e8f0fe; border-radius:8px; padding:10px; margin-bottom:12px;">
+          <div style="font-size:12px; font-weight:bold; color:#1a3a6b; margin-bottom:8px;">★ 片手ハング（体重計<strong>最小値</strong>を入力）</div>
+          <div style="display:grid; grid-template-columns:28px 1fr 1fr 1fr; gap:6px; align-items:center; margin-bottom:6px;">
+            <span style="font-size:13px; font-weight:bold;">右</span>
+            <input class="ca-trial-input" id="f-sc-fi-r1" type="number" placeholder="30.0" step="0.1" oninput="updateScaleCalc()">
+            <input class="ca-trial-input" id="f-sc-fi-r2" type="number" placeholder="28.5" step="0.1" oninput="updateScaleCalc()">
+            <span id="ca-sc-fi-r-result" style="font-size:12px; color:#1a3a6b; font-weight:bold;">—</span>
+          </div>
+          <div style="display:grid; grid-template-columns:28px 1fr 1fr 1fr; gap:6px; align-items:center;">
+            <span style="font-size:13px; font-weight:bold;">左</span>
+            <input class="ca-trial-input" id="f-sc-fi-l1" type="number" placeholder="32.0" step="0.1" oninput="updateScaleCalc()">
+            <input class="ca-trial-input" id="f-sc-fi-l2" type="number" placeholder="31.0" step="0.1" oninput="updateScaleCalc()">
+            <span id="ca-sc-fi-l-result" style="font-size:12px; color:#1a3a6b; font-weight:bold;">—</span>
+          </div>
+        </div>
+
+        <div style="font-size:12px; font-weight:bold; color:#555; margin-bottom:6px;">リフティングエッジ（体重計<strong>最大値</strong>を入力）</div>
+        <div style="display:grid; grid-template-columns:28px 1fr 1fr 1fr; gap:6px; align-items:center; margin-bottom:6px;">
+          <span style="font-size:13px; font-weight:bold;">右</span>
+          <input class="ca-trial-input" id="f-sc-le-r1" type="number" placeholder="75.0" step="0.1" oninput="updateScaleCalc()">
+          <input class="ca-trial-input" id="f-sc-le-r2" type="number" placeholder="76.5" step="0.1" oninput="updateScaleCalc()">
+          <span id="ca-sc-le-r-result" style="font-size:12px; color:#555; font-weight:bold;">—</span>
+        </div>
+        <div style="display:grid; grid-template-columns:28px 1fr 1fr 1fr; gap:6px; align-items:center;">
+          <span style="font-size:13px; font-weight:bold;">左</span>
+          <input class="ca-trial-input" id="f-sc-le-l1" type="number" placeholder="73.0" step="0.1" oninput="updateScaleCalc()">
+          <input class="ca-trial-input" id="f-sc-le-l2" type="number" placeholder="74.0" step="0.1" oninput="updateScaleCalc()">
+          <span id="ca-sc-le-l-result" style="font-size:12px; color:#555; font-weight:bold;">—</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div><!-- /step-2 -->
+
+  <!-- Step 3: ② 指持久力 -->
+  <div class="ca-form-step" id="ca-step-3">
+  <div class="ca-step-instr">
+  <b>インターミットプロトコル（7s on / 3s off）</b><br>
+  ① 強度：最大筋力の60%相当（MVC×0.6）<br>
+  ② 20mmエッジ・ハーフクリンプ・自重<br>
+  ③ 7秒ハング → 3秒レスト を繰り返す<br>
+  ④ フォームが崩れた・保持できなくなった時点で終了<br>
+  ⑤ 完了できたセット数を記録
+</div>
+  <!-- ② 指持久力 -->
+  <div class="ca-card">
+    <div class="ca-card-header">② 指持久力（インターミット・7s on / 3s off）</div>
+    <div class="ca-card-body">
+      <div style="font-size:11px; color:#888; margin-bottom:10px;">20mmエッジ・ハーフクリンプ・自重。フォーム崩れで終了</div>
+      <div style="display:flex; align-items:center; justify-content:center; gap:12px;">
+        <span style="font-weight:bold; font-size:14px;">限界セット数</span>
+        <input class="ca-form-input" id="f-endurance" type="number" placeholder="10" min="0" max="50" style="max-width:80px; text-align:center; font-size:20px; font-weight:bold;">
+        <span style="font-size:13px; color:#666;">セット</span>
+      </div>
+    </div>
+  </div>
+  </div><!-- /step-3 -->
+
+  <!-- Step 4: ③ 上肢プル -->
+  <div class="ca-form-step" id="ca-step-4">
+  <div class="ca-step-instr">
+  <b>【プルセンサー法】HHD等尺性プル（肘90°屈曲位）</b><br>
+  ① 肢位：立位または座位・肘90°屈曲・前腕中間位<br>
+  ② 検者がHHDを手首近位に当て固定<br>
+  ③ 「引き付ける方向」に最大等尺性収縮・3〜5秒<br>
+  ④ 試技間休息：1分・2試技の高い方を採用<br>
+  <b>【体重計法】等尺性ロウ</b><br>
+  ① 体重計に乗り静止体重を確認<br>
+  ② 腰〜胸の高さに固定バーをセット<br>
+  ③ 肘90°屈曲位で固定バーを引き付ける（等尺性）<br>
+  ④ 体重計の<strong>最小値</strong>を記録。2試技の低い方を採用<br>
+  ⑤ 指力 = 体重 − 体重計最小値
+</div>
+  <!-- ③ 上肢プル -->
+  <div class="ca-card">
+    <div class="ca-card-header">③ 上肢プル（等尺性プル）</div>
+    <div class="ca-card-body">
+      <!-- 測定方法トグル -->
+      <div style="margin-bottom:12px;">
+        <div style="font-size:12px; color:#666; margin-bottom:6px;">測定方法</div>
+        <div class="ca-radio-group">
+          <div class="ca-radio-btn checked" id="ca-pu-method-sensor" onclick="CA_setPuMethod('sensor',this)">プルセンサー（kg入力）</div>
+          <div class="ca-radio-btn" id="ca-pu-method-scale" onclick="CA_setPuMethod('scale',this)">体重計法（kg入力）</div>
+        </div>
+      </div>
+      <!-- センサー入力 -->
+      <div id="ca-pu-sensor-inputs">
+        <div class="ca-trial-grid">
+          <span class="ca-t-side">右</span>
+          <span class="ca-t-label">試技①</span><span></span>
+          <span class="ca-t-label">試技②</span>
+          <span class="ca-t-unit">kg</span>
+        </div>
+        <div class="ca-trial-grid">
+          <span></span>
+          <input class="ca-trial-input" id="f-pu-r1" type="number" placeholder="38" min="0" max="200">
+          <span class="ca-t-label" style="color:#bbb;">—</span>
+          <input class="ca-trial-input" id="f-pu-r2" type="number" placeholder="39" min="0" max="200">
+          <span></span>
+        </div>
+        <div class="ca-trial-grid" style="margin-top:6px;">
+          <span class="ca-t-side">左</span>
+          <span class="ca-t-label">試技①</span><span></span>
+          <span class="ca-t-label">試技②</span>
+          <span class="ca-t-unit">kg</span>
+        </div>
+        <div class="ca-trial-grid">
+          <span></span>
+          <input class="ca-trial-input" id="f-pu-l1" type="number" placeholder="50" min="0" max="200">
+          <span class="ca-t-label" style="color:#bbb;">—</span>
+          <input class="ca-trial-input" id="f-pu-l2" type="number" placeholder="52" min="0" max="200">
+          <span></span>
+        </div>
+      </div>
+      <!-- 体重計法入力 -->
+      <div id="ca-pu-scale-inputs" style="display:none;">
+        <div style="background:#fff3e0; border-radius:8px; padding:10px; margin-bottom:12px; font-size:11px; color:#555; line-height:1.7;">
+          <strong style="color:#e65100;">計算式：</strong>上肢プル力 = 体重 − 体重計<strong>最小値</strong>
+        </div>
+        <div style="background:#e8f0fe; border-radius:8px; padding:10px; margin-bottom:12px;">
+          <div style="font-size:12px; font-weight:bold; color:#1a3a6b; margin-bottom:8px;">体重計最小値を入力</div>
+          <div style="display:grid; grid-template-columns:28px 1fr 1fr 1fr; gap:6px; align-items:center; margin-bottom:6px;">
+            <span style="font-size:13px; font-weight:bold;">右</span>
+            <input class="ca-trial-input" id="f-sc-pu-r1" type="number" placeholder="22.0" step="0.1" oninput="updateScaleCalc()">
+            <input class="ca-trial-input" id="f-sc-pu-r2" type="number" placeholder="21.5" step="0.1" oninput="updateScaleCalc()">
+            <span id="ca-sc-pu-r-result" style="font-size:12px; color:#1a3a6b; font-weight:bold;">—</span>
+          </div>
+          <div style="display:grid; grid-template-columns:28px 1fr 1fr 1fr; gap:6px; align-items:center;">
+            <span style="font-size:13px; font-weight:bold;">左</span>
+            <input class="ca-trial-input" id="f-sc-pu-l1" type="number" placeholder="24.0" step="0.1" oninput="updateScaleCalc()">
+            <input class="ca-trial-input" id="f-sc-pu-l2" type="number" placeholder="23.5" step="0.1" oninput="updateScaleCalc()">
+            <span id="ca-sc-pu-l-result" style="font-size:12px; color:#1a3a6b; font-weight:bold;">—</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div><!-- /step-4 -->
+
+  <!-- Step 5: ④ 肩ER/IR -->
+  <div class="ca-form-step" id="ca-step-5">
+  <div class="ca-step-instr">
+  <b>肩90/90位・HHD等尺性測定</b><br>
+  ① 肢位：肩90°外転・肘90°屈曲（90/90位）・肘は台に置く<br>
+  ② ER（外旋）：前腕を後方へ → HHDを手首に当てて抵抗<br>
+  ③ IR（内旋）：前腕を前方へ → 同様に測定<br>
+  ④ 各方向2試技・最大値採用<br>
+  <b>解釈：</b>ER/IR比 = ER値 ÷ IR値。正常は0.65〜1.05（IRが優位）
+</div>
+  <!-- ④ 肩ER/IR -->
+  <div class="ca-card">
+    <div class="ca-card-header">④ 肩外旋（ER）・内旋（IR）筋力【90/90位】</div>
+    <div class="ca-card-body">
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+        <div>
+          <div class="ca-form-label" style="font-weight:bold;">ER（外旋）右</div>
+          <div style="display:flex; gap:6px; margin-bottom:6px;">
+            <input class="ca-trial-input" id="f-er-r1" type="number" placeholder="①" min="0" max="100" style="flex:1;">
+            <input class="ca-trial-input" id="f-er-r2" type="number" placeholder="②" min="0" max="100" style="flex:1;">
+            <span class="ca-t-unit" style="align-self:center;">N</span>
+          </div>
+          <div class="ca-form-label" style="font-weight:bold;">IR（内旋）右</div>
+          <div style="display:flex; gap:6px;">
+            <input class="ca-trial-input" id="f-ir-r1" type="number" placeholder="①" min="0" max="100" style="flex:1;">
+            <input class="ca-trial-input" id="f-ir-r2" type="number" placeholder="②" min="0" max="100" style="flex:1;">
+            <span class="ca-t-unit" style="align-self:center;">N</span>
+          </div>
+        </div>
+        <div>
+          <div class="ca-form-label" style="font-weight:bold;">ER（外旋）左</div>
+          <div style="display:flex; gap:6px; margin-bottom:6px;">
+            <input class="ca-trial-input" id="f-er-l1" type="number" placeholder="①" min="0" max="100" style="flex:1;">
+            <input class="ca-trial-input" id="f-er-l2" type="number" placeholder="②" min="0" max="100" style="flex:1;">
+            <span class="ca-t-unit" style="align-self:center;">N</span>
+          </div>
+          <div class="ca-form-label" style="font-weight:bold;">IR（内旋）左</div>
+          <div style="display:flex; gap:6px;">
+            <input class="ca-trial-input" id="f-ir-l1" type="number" placeholder="①" min="0" max="100" style="flex:1;">
+            <input class="ca-trial-input" id="f-ir-l2" type="number" placeholder="②" min="0" max="100" style="flex:1;">
+            <span class="ca-t-unit" style="align-self:center;">N</span>
+          </div>
+        </div>
+      </div>
+      <div style="font-size:11px; color:#888; margin-top:8px;">ER/IR比：≥0.75 良好　0.65〜0.74 許容　&lt;0.65 要介入</div>
+    </div>
+  </div>
+  </div><!-- /step-5 -->
+
+  <!-- Step 6: ⑤ 体幹 -->
+  <div class="ca-form-step" id="ca-step-6">
+  <div class="ca-step-instr">
+  <b>フロントプランク</b>：肘・足先支持・腰を水平に保つ。崩れるまでの秒数<br>
+  <b>ハンギングLR（レッグレイズ）</b>：懸垂バーにぶら下がり・膝伸展で両足を水平以上まで挙上・戻す。反動なし。できた回数
+</div>
+  <!-- ⑤ 体幹 -->
+  <div class="ca-card">
+    <div class="ca-card-header">⑤ 体幹（フロントプランク・ハンギングLR）</div>
+    <div class="ca-card-body">
+      <div class="ca-form-row">
+        <div class="ca-form-group">
+          <label class="ca-form-label">フロントプランク (秒)</label>
+          <input class="ca-form-input" id="f-plank" type="number" placeholder="90" min="0" max="600" style="text-align:center;">
+        </div>
+        <div class="ca-form-group">
+          <label class="ca-form-label">ハンギングLR (回)</label>
+          <input class="ca-form-input" id="f-lr" type="number" placeholder="15" min="0" max="50" style="text-align:center;">
+        </div>
+      </div>
+    </div>
+  </div>
+  </div><!-- /step-6 -->
+
+  <!-- Step 7: ⑥ AGFR -->
+  <div class="ca-form-step" id="ca-step-7">
+  <div class="ca-step-instr">
+  <b>AGFR（Active Groin Flexibility Ratio）</b><br>
+  ① 壁から23cm離れた位置に横向きで立つ<br>
+  ② 測定側の脚を外旋させながら側方へ最大挙上<br>
+  ③ 内果（内くるぶし）の床からの高さをcmで記録<br>
+  ④ 左右差15%以上で注意<br>
+  基準：ビギナー平均103.7cm・エリート平均114.0cm
+</div>
+  <!-- ⑥ AGFR -->
+  <div class="ca-card">
+    <div class="ca-card-header">⑥ AGFR（足挙上高）</div>
+    <div class="ca-card-body">
+      <div style="font-size:11px; color:#888; margin-bottom:8px;">壁から23cm・外旋させながら側方挙上・内果高を計測</div>
+      <div class="ca-form-row">
+        <div class="ca-form-group">
+          <label class="ca-form-label">右 (cm)</label>
+          <input class="ca-form-input" id="f-agfr-r" type="number" placeholder="105" step="0.5" style="text-align:center;">
+        </div>
+        <div class="ca-form-group">
+          <label class="ca-form-label">左 (cm)</label>
+          <input class="ca-form-input" id="f-agfr-l" type="number" placeholder="110" step="0.5" style="text-align:center;">
+        </div>
+      </div>
+    </div>
+  </div>
+  </div><!-- /step-7 -->
+
+  <!-- Step 8: ⑦ Straddle-Stand -->
+  <div class="ca-form-step" id="ca-step-8">
+  <div class="ca-step-instr">
+  <b>Straddle-Stand（壁向き開脚・恥骨-壁距離）</b><br>
+  ① 壁に正対して立ち、両足を最大限に開脚（外転）<br>
+  ② 足裏は床・足先は壁と平行<br>
+  ③ 恥骨結合から壁までの距離（cm）を測定<br>
+  <b>判定：値が小さいほど優秀</b>（エリート平均 38.2cm）<br>
+  ※クライミングのハイステップ・フラッグの可動域に直結
+</div>
+  <!-- ⑦ Straddle-Stand -->
+  <div class="ca-card">
+    <div class="ca-card-header">⑦ Straddle-Stand（恥骨-壁距離）</div>
+    <div class="ca-card-body">
+      <div style="font-size:11px; color:#888; margin-bottom:8px;">壁向き開脚立ち・値が小さいほど優秀（エリート平均 38.2cm）</div>
+      <div class="ca-form-group">
+        <label class="ca-form-label">恥骨-壁距離 (cm)</label>
+        <input class="ca-form-input" id="f-straddle" type="number" placeholder="45" step="0.5" style="text-align:center; font-size:22px; font-weight:bold;">
+      </div>
+    </div>
+  </div>
+  </div><!-- /step-8 -->
+
+  <!-- Step 9: ⑧ 足首背屈 -->
+  <div class="ca-form-step" id="ca-step-9">
+  <div class="ca-step-instr">
+  <b>WBLT（Weight-Bearing Lunge Test）母趾-壁距離</b><br>
+  ① 壁に正対して立ち、測定する足を壁向きに置く<br>
+  ② 母趾を壁に近づけながら膝を壁にタッチするようにランジ<br>
+  ③ 踵が浮かない最大距離（母趾先端〜壁）をcmで記録<br>
+  ④ 1試技ずつ（右・左）<br>
+  基準：目標12cm以上・臨床下限9cm・左右差1.5cm以上で注意
+</div>
+  <!-- ⑧ 足首背屈 -->
+  <div class="ca-card">
+    <div class="ca-card-header">⑧ 足首背屈（WBLT・母趾-壁距離）</div>
+    <div class="ca-card-body">
+      <div style="font-size:11px; color:#888; margin-bottom:8px;">母趾先端→壁。踵が浮かずに膝が壁タッチできる最大距離。大きいほど良好。（目標≥12cm）</div>
+      <div style="display:flex; align-items:center; gap:12px; margin-bottom:8px;">
+        <span class="ca-t-side">右</span>
+        <input class="ca-trial-input" id="f-an-r1" type="number" placeholder="9.0" step="0.5" min="0" max="25" style="max-width:100px;">
+        <span style="font-size:14px; color:#666;">cm</span>
+      </div>
+      <div style="display:flex; align-items:center; gap:12px;">
+        <span class="ca-t-side">左</span>
+        <input class="ca-trial-input" id="f-an-l1" type="number" placeholder="9.5" step="0.5" min="0" max="25" style="max-width:100px;">
+        <span style="font-size:14px; color:#666;">cm</span>
+      </div>
+    </div>
+  </div>
+  </div><!-- /step-9 -->
+
+  <!-- Step 10: ⑨ パワースラップ（任意） -->
+  <div class="ca-form-step" id="ca-step-10">
+  <div class="ca-step-instr">
+  <b>パワースラップ（Draper et al. 2011 / IRCRAバッテリー準拠）</b><br>
+  ① スタートラング固定・両手でフルエクステンション（肘伸展）でぶら下がる<br>
+  ② <b>反動なし</b>で静止を確認してからスタート（検者が目視確認）<br>
+  ③ 爆発的に両腕で引きつけ、片手を離してできるだけ高くチョーク跡をつける<br>
+  ④ 測定値：スタートラングからチョーク跡までの距離（cm）<br>
+  　　　例：ラング間隔7cm × 到達ラング差 = 距離cm<br>
+  ⑤ 左右それぞれ2〜3試技・最大値採用<br>
+  <b>基準：</b>Elite 75–90cm以上（V9+）/ Advanced 55–75cm（V5–V9）/ Intermediate 35–55cm（V1–V4）<br>
+  ※ジム実施・未測定の場合は空欄でスキップ可
+</div>
+  <!-- ⑨ パワースラップ（任意） -->
+  <div class="ca-card">
+    <div class="ca-card-header" style="background:#555;">⑨ パワースラップ（キャンパスボード）　<span style="font-weight:normal; font-size:11px;">※ジム実施・任意</span></div>
+    <div class="ca-card-body">
+      <div style="font-size:11px; color:#888; margin-bottom:8px;">反動なし・爆発的懸垂・片手チョークタッチ。未測定の場合は空欄でOK</div>
+      <div class="ca-trial-grid">
+        <span class="ca-t-side">右</span>
+        <span class="ca-t-label">試技①</span><span></span>
+        <span class="ca-t-label">試技②</span>
+        <span class="ca-t-unit">cm</span>
+      </div>
+      <div class="ca-trial-grid">
+        <span></span>
+        <input class="ca-trial-input" id="f-sl-r1" type="number" placeholder="" min="0" max="200">
+        <span class="ca-t-label" style="color:#bbb;">—</span>
+        <input class="ca-trial-input" id="f-sl-r2" type="number" placeholder="" min="0" max="200">
+        <span></span>
+      </div>
+      <div class="ca-trial-grid" style="margin-top:6px;">
+        <span class="ca-t-side">左</span>
+        <span class="ca-t-label">試技①</span><span></span>
+        <span class="ca-t-label">試技②</span>
+        <span class="ca-t-unit">cm</span>
+      </div>
+      <div class="ca-trial-grid">
+        <span></span>
+        <input class="ca-trial-input" id="f-sl-l1" type="number" placeholder="" min="0" max="200">
+        <span class="ca-t-label" style="color:#bbb;">—</span>
+        <input class="ca-trial-input" id="f-sl-l2" type="number" placeholder="" min="0" max="200">
+        <span></span>
+      </div>
+      <div class="ca-form-row" style="margin-top:10px;">
+        <div class="ca-form-group">
+          <label class="ca-form-label">スタートラング番号</label>
+          <input class="ca-form-input" id="f-sl-rung" type="number" placeholder="1" min="1">
+        </div>
+        <div class="ca-form-group">
+          <label class="ca-form-label">ラング間距離 (cm)</label>
+          <input class="ca-form-input" id="f-sl-dist" type="number" placeholder="22" step="0.5">
+        </div>
+      </div>
+    </div>
+  </div>
+  </div><!-- /step-10 -->
+
+  <div class="ca-step-nav">
+    <button class="ca-btn ca-btn-outline" id="ca-btn-step-back" onclick="CA_stepBack()" style="flex:1;visibility:hidden;">← 前へ</button>
+    <button class="ca-btn ca-btn-accent" id="ca-btn-step-next" onclick="CA_stepNext()" style="flex:2;">次へ →</button>
+    <button class="ca-btn" id="ca-btn-step-save" onclick="CA_submitAndSave()" style="flex:2;background:#2e7d32;color:#fff;display:none;">✅ 保存して完了</button>
+  </div>
+
+  </div><!-- /pb-safe -->
+</div>
+
+<!-- ================================================================
+     結果画面
+     ================================================================ -->
+<div id="ca-screen-result" class="ca-screen">
+  <div class="ca-header">
+    <button class="ca-btn-icon" onclick="CA_showScreen('home')">←</button>
+    <h1>分析結果</h1>
+    <button class="ca-btn-icon" onclick="CA_saveRecord()" title="保存">💾</button>
+  </div>
+  <div id="ca-result-body"></div>
+</div>
+
+<!-- ================================================================
+     JavaScript
+     ================================================================ -->
+  </div>
+
   <!-- Tab: Settings -->
   <div id="tab-set" class="panel">
     <div id="set-content"></div>
@@ -501,6 +1294,9 @@ body{
   </button>
   <button class="nbtn" id="nbtn-prog" onclick="switchTab('prog')">
     <span class="ico">📊</span>進捗
+  </button>
+  <button class="nbtn" id="nbtn-check" onclick="switchTab('check')">
+    <span class="ico">🧗</span>チェック
   </button>
   <button class="nbtn" id="nbtn-set" onclick="switchTab('set')">
     <span class="ico">⚙️</span>設定
@@ -1223,6 +2019,15 @@ function renderSettings() {
     <button class="danger-btn" style="border-color:#aaa;color:#aaa;margin-top:6px" onclick="exportData()">データをエクスポート（JSON）</button>
   </div>`;
 
+  html += `<div class="set-section">
+    <div class="set-section-ttl">プログラムインポート</div>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:10px;line-height:1.6;">
+      AIが生成したJSONをここに貼り付けてインポートできます。<br>
+      ※スケジュールは上書き。トレーニングログは保持されます。
+    </div>
+    <textarea id="import-program-json" class="textarea" placeholder='{"schedule":[...],"customExercises":{}}' style="min-height:80px;font-size:11px;font-family:monospace;"></textarea>
+    <button onclick="importProgramJSON()" style="width:100%;padding:11px;background:var(--blue);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;margin-top:8px;">📥 プログラムをインポート</button>
+  </div>`;
   document.getElementById('set-content').innerHTML = html;
 }
 
@@ -1237,6 +2042,7 @@ function switchTab(t) {
   if (t === 'today') renderToday();
   if (t === 'cal') { calDate = new Date(); renderCalendar(); }
   if (t === 'prog') renderProgress();
+  if (t === 'check') CA_renderHome();
   if (t === 'set') renderSettings();
 }
 
@@ -1552,6 +2358,932 @@ document.addEventListener('DOMContentLoaded', init);
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('./sw.js').catch(() => {});
 }
+
+// ─── プログラムインポート ─────────────────────────────────────
+function importProgramJSON() {
+  const el = document.getElementById('import-program-json');
+  const txt = (el ? el.value : '').trim();
+  if (!txt) { showToast('JSONを入力してください'); return; }
+  try {
+    const data = JSON.parse(txt);
+    if (!data.schedule || !Array.isArray(data.schedule) || data.schedule.length !== 7) {
+      showToast('形式エラー: scheduleは7要素の配列が必要です'); return;
+    }
+    if (!confirm('スケジュールを上書きします。よろしいですか?\n（トレーニングログは保持されます）')) return;
+    S.schedule = data.schedule;
+    if (data.customExercises) S.customExercises = Object.assign({}, S.customExercises || {}, data.customExercises);
+    if (data.dailyExids) S.dailyExids = data.dailyExids;
+    if (data.evalDates) S.evalDates = data.evalDates;
+    if (data.startDate) S.startDate = data.startDate;
+    saveSettings();
+    if (el) el.value = '';
+    renderSettings();
+    renderToday();
+    showToast('インポートしました！');
+  } catch(e) { showToast('JSON解析エラー: ' + e.message); }
+}
+
+
+// ══════════════════════════════════════════
+//  フィジカルチェック JS
+// ══════════════════════════════════════════
+
+// ─── ストレージ ──────────────────────────────────────────────
+const CA_KEY = 'climbing_records_v1';
+let CA_records = [];
+let CA_current = null;
+let CA_chart = null;
+let CA_cond = 'normal';
+let CA_editingId = null;
+let CA_fiMethod = 'sensor';
+let CA_puMethod = 'sensor';
+
+let CA_currentStep = 1;
+const TOTAL_STEPS = 10;
+const STEP_TITLES = [
+  '基本情報',
+  '① 指力MVC',
+  '② 指持久力',
+  '③ 上肢プル',
+  '④ 肩ER/IR筋力',
+  '⑤ 体幹',
+  '⑥ AGFR（足挙上高）',
+  '⑦ Straddle-Stand',
+  '⑧ 足首背屈（WBLT）',
+  '⑨ パワースラップ（任意）',
+];
+function CA_goToStep(n) {
+  CA_currentStep = Math.max(1, Math.min(TOTAL_STEPS, n));
+  document.querySelectorAll('#tab-check .ca-form-step').forEach(el => el.classList.remove('active'));
+  document.getElementById('ca-step-' + CA_currentStep).classList.add('active');
+  document.getElementById('ca-step-progress-bar').style.width = (CA_currentStep / TOTAL_STEPS * 100) + '%';
+  document.getElementById('ca-step-counter').textContent = CA_currentStep + ' / ' + TOTAL_STEPS;
+  document.getElementById('ca-step-title-text').textContent = STEP_TITLES[CA_currentStep - 1];
+  document.getElementById('ca-btn-step-back').style.visibility = CA_currentStep === 1 ? 'hidden' : 'visible';
+  document.getElementById('ca-btn-step-next').textContent = CA_currentStep === TOTAL_STEPS ? '📊 結果を見る' : '次へ →';
+  const jumpSel = document.getElementById('ca-step-jump-select');
+  if (jumpSel) jumpSel.value = CA_currentStep;
+  window.scrollTo(0, 0);
+}
+function CA_stepNext() {
+  if (CA_currentStep === TOTAL_STEPS) { CA_submitForm(); } else { CA_goToStep(CA_currentStep + 1); }
+}
+function CA_stepBack() { CA_goToStep(CA_currentStep - 1); }
+
+function CA_load()  { try { CA_records = JSON.parse(localStorage.getItem(CA_KEY)) || []; } catch(e) { CA_records = []; } }
+function CA_store() { localStorage.setItem(CA_KEY, JSON.stringify(CA_records)); }
+
+// ─── ナビゲーション ───────────────────────────────────────────
+function CA_showScreen(name) {
+  document.querySelectorAll('#tab-check .ca-screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('ca-screen-' + name).classList.add('active');
+  window.scrollTo(0, 0);
+  if (name === 'home') CA_renderHome();
+}
+function CA_openModal(id)  { document.getElementById(id).classList.add('open'); }
+function CA_closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+// ─── ホーム ───────────────────────────────────────────────────
+function CA_renderHome() {
+  CA_load();
+  const list = document.getElementById('ca-record-list');
+  if (!CA_records.length) {
+    list.innerHTML = `<div class="empty-state"><div class="empty-icon">🧗</div><div style="font-weight:bold;margin-bottom:6px;">まだ記録がありません</div><div style="font-size:13px;">右下の ＋ ボタンで測定を始めましょう</div></div>`;
+    return;
+  }
+  const sorted = [...records].sort((a,b) => b.date.localeCompare(a.date));
+  list.innerHTML = sorted.map(r => {
+    const bmi = r.height && r.weight ? (r.weight/(r.height/100)**2).toFixed(1) : '—';
+    return `<div class="record-item">
+      <div class="record-icon" onclick="CA_viewRecord('${r.id}')">🧗</div>
+      <div style="flex:1;min-width:0;" onclick="CA_viewRecord('${r.id}')">
+        <div class="record-name">${r.name||'—'}</div>
+        <div class="record-date">${CA_fmtDate(r.date)}</div>
+        <div class="record-info">BMI ${bmi}　${r.grade?'B: '+r.grade:''}　${r.years?r.years+'年':''}</div>
+      </div>
+      <button onclick="CA_deleteRecord('${r.id}')" style="background:none;border:none;color:#e57373;font-size:20px;padding:8px;cursor:pointer;flex-shrink:0;" title="削除">🗑</button>
+    </div>`;
+  }).join('');
+}
+
+function CA_fmtDate(d) {
+  if (!d) return '—';
+  const x = new Date(d);
+  return `${x.getFullYear()}年${x.getMonth()+1}月${x.getDate()}日`;
+}
+
+// ─── バックアップ ─────────────────────────────────────────────
+function CA_doExport() {
+  const b = new Blob([JSON.stringify(CA_records, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(b);
+  a.download = `climbing-check-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  CA_closeModal('modal-menu');
+}
+function CA_doImport(e) {
+  const f = e.target.files[0];
+  if (!f) return;
+  const r = new FileReader();
+  r.onload = ev => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      if (Array.isArray(data)) {
+        CA_load();
+        const ids = new Set(CA_records.map(x => x.id));
+        const added = data.filter(x => !ids.has(x.id));
+        CA_records = [...records, ...added];
+        CA_store();
+        CA_renderHome();
+        alert(`${added.length}件をインポートしました。`);
+      }
+    } catch(err) { alert('ファイルの読み込みに失敗しました。'); }
+  };
+  r.readAsText(f);
+  e.target.value = '';
+  CA_closeModal('modal-menu');
+}
+
+// ─── フォーム ─────────────────────────────────────────────────
+function CA_startNew() {
+  CA_resetForm();
+  CA_goToStep(1);
+  CA_showScreen('form');
+}
+
+function CA_setFiMethod(method, el) {
+  CA_fiMethod = method;
+  document.querySelectorAll('#ca-fi-method-sensor,#ca-fi-method-scale').forEach(b => b.classList.remove('checked'));
+  if (el) el.classList.add('checked');
+  document.getElementById('ca-fi-sensor-inputs').style.display = method === 'sensor' ? '' : 'none';
+  document.getElementById('ca-fi-scale-inputs').style.display  = method === 'scale'  ? '' : 'none';
+  if (method === 'scale') CA_updateScaleCalc();
+}
+function CA_setPuMethod(method, el) {
+  CA_puMethod = method;
+  document.querySelectorAll('#ca-pu-method-sensor,#ca-pu-method-scale').forEach(b => b.classList.remove('checked'));
+  if (el) el.classList.add('checked');
+  document.getElementById('ca-pu-sensor-inputs').style.display = method === 'sensor' ? '' : 'none';
+  document.getElementById('ca-pu-scale-inputs').style.display  = method === 'scale'  ? '' : 'none';
+  if (method === 'scale') CA_updateScaleCalc();
+}
+
+function CA_updateScaleCalc() {
+  const weight = parseFloat(document.getElementById('f-weight').value) || 0;
+  const added  = parseFloat(document.getElementById('f-sc-added').value) || 0;
+  const total  = weight + added;
+  const showHang = (id1, id2, elId) => {
+    const v1 = parseFloat(document.getElementById(id1).value);
+    const v2 = parseFloat(document.getElementById(id2).value);
+    const vals = [v1, v2].filter(v => !isNaN(v));
+    const el = document.getElementById(elId);
+    if (!vals.length || total === 0) { el.textContent = '—'; return; }
+    const kg = total - Math.min(...vals);
+    el.textContent = `${kg.toFixed(1)}kg (${weight > 0 ? (kg/weight*100).toFixed(0) : '—'}%BW)`;
+  };
+  const showLift = (id1, id2, elId) => {
+    const v1 = parseFloat(document.getElementById(id1).value);
+    const v2 = parseFloat(document.getElementById(id2).value);
+    const vals = [v1, v2].filter(v => !isNaN(v));
+    const el = document.getElementById(elId);
+    if (!vals.length || weight === 0) { el.textContent = '—'; return; }
+    const kg = Math.max(...vals) - weight;
+    el.textContent = `${kg.toFixed(1)}kg (${(kg/weight*100).toFixed(0)}%BW)`;
+  };
+  showHang('f-sc-fi-r1','f-sc-fi-r2','sc-fi-r-result');
+  showHang('f-sc-fi-l1','f-sc-fi-l2','sc-fi-l-result');
+  showLift('f-sc-le-r1','f-sc-le-r2','sc-le-r-result');
+  showLift('f-sc-le-l1','f-sc-le-l2','sc-le-l-result');
+  // 上肢プル体重計法（ハング方式：体重 − 最小値）
+  showHang('f-sc-pu-r1','f-sc-pu-r2','sc-pu-r-result');
+  showHang('f-sc-pu-l1','f-sc-pu-l2','sc-pu-l-result');
+}
+
+function CA_setCond(val, el) {
+  CA_cond = val;
+  document.querySelectorAll('#CA_cond-group .radio-btn').forEach(b => b.classList.remove('checked'));
+  el.classList.add('checked');
+}
+
+function CA_resetForm() {
+  CA_setFiMethod('sensor', document.getElementById('ca-fi-method-sensor'));
+  CA_setPuMethod('sensor', document.getElementById('ca-pu-method-sensor'));
+  const ids = ['f-name','f-age','f-height','f-weight','f-date','f-years','f-grade','f-injury',
+    'f-fi-r1','f-fi-r2','f-fi-l1','f-fi-l2','f-le-r1','f-le-r2','f-le-l1','f-le-l2',
+    'f-sc-added','f-sc-fi-r1','f-sc-fi-r2','f-sc-fi-l1','f-sc-fi-l2',
+    'f-sc-le-r1','f-sc-le-r2','f-sc-le-l1','f-sc-le-l2','f-endurance',
+    'f-pu-r1','f-pu-r2','f-pu-l1','f-pu-l2',
+    'f-sc-pu-r1','f-sc-pu-r2','f-sc-pu-l1','f-sc-pu-l2',
+    'f-er-r1','f-er-r2','f-er-l1','f-er-l2','f-ir-r1','f-ir-r2','f-ir-l1','f-ir-l2',
+    'f-plank','f-lr','f-agfr-r','f-agfr-l','f-straddle',
+    'f-an-r1','f-an-l1',
+    'f-sl-r1','f-sl-r2','f-sl-l1','f-sl-l2','f-sl-rung','f-sl-dist'];
+  ids.forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  document.getElementById('f-date').value = new Date().toISOString().slice(0,10);
+  CA_cond = 'normal';
+  document.querySelectorAll('#CA_cond-group .radio-btn').forEach((b,i) => b.classList.toggle('checked', i===1));
+  document.getElementById('ca-step-jump-bar').style.display = 'none';
+  document.getElementById('ca-btn-step-save').style.display = 'none';
+  document.getElementById('ca-form-screen-title').textContent = '測定データ入力';
+  CA_goToStep(1);
+}
+
+const gn = id => { const v = parseFloat(document.getElementById(id)?.value); return isNaN(v) ? null : v; };
+const gs = id => document.getElementById(id)?.value?.trim() || '';
+const mx = (...a) => { const v = a.filter(x => x !== null); return v.length ? Math.max(...v) : null; };
+
+function CA_submitForm() {
+  const name = gs('f-name'), weight = gn('f-weight'), height = gn('f-height');
+  if (!name || !weight || !height) { alert('氏名・身長・体重は必須です。'); return; }
+  const bw = weight;
+  let frMax, flMax, leRMax, leLMax;
+  let sc_added = null, sc_fi_r1 = null, sc_fi_r2 = null, sc_fi_l1 = null, sc_fi_l2 = null;
+  let sc_le_r1 = null, sc_le_r2 = null, sc_le_l1 = null, sc_le_l2 = null;
+  if (CA_fiMethod === 'scale') {
+    const added = gn('f-sc-added') || 0;
+    const total = weight + added;
+    const hangN = (s1, s2) => {
+      const v1 = gn(s1), v2 = gn(s2);
+      const vals = [v1, v2].filter(v => v !== null);
+      if (!vals.length) return null;
+      return +((total - Math.min(...vals))).toFixed(1);
+    };
+    const liftN = (s1, s2) => {
+      const v1 = gn(s1), v2 = gn(s2);
+      const vals = [v1, v2].filter(v => v !== null);
+      if (!vals.length) return null;
+      return +((Math.max(...vals) - weight)).toFixed(1);
+    };
+    frMax  = hangN('f-sc-fi-r1','f-sc-fi-r2');
+    flMax  = hangN('f-sc-fi-l1','f-sc-fi-l2');
+    leRMax = liftN('f-sc-le-r1','f-sc-le-r2');
+    leLMax = liftN('f-sc-le-l1','f-sc-le-l2');
+    sc_added = added;
+    sc_fi_r1 = gn('f-sc-fi-r1'); sc_fi_r2 = gn('f-sc-fi-r2');
+    sc_fi_l1 = gn('f-sc-fi-l1'); sc_fi_l2 = gn('f-sc-fi-l2');
+    sc_le_r1 = gn('f-sc-le-r1'); sc_le_r2 = gn('f-sc-le-r2');
+    sc_le_l1 = gn('f-sc-le-l1'); sc_le_l2 = gn('f-sc-le-l2');
+  } else {
+    frMax  = mx(gn('f-fi-r1'), gn('f-fi-r2'));
+    flMax  = mx(gn('f-fi-l1'), gn('f-fi-l2'));
+    leRMax = mx(gn('f-le-r1'), gn('f-le-r2'));
+    leLMax = mx(gn('f-le-l1'), gn('f-le-l2'));
+  }
+  let prMax, plMax, sc_pu_r1 = null, sc_pu_r2 = null, sc_pu_l1 = null, sc_pu_l2 = null;
+  if (CA_puMethod === 'scale') {
+    const hangPu = (s1, s2) => {
+      const vals = [gn(s1), gn(s2)].filter(v => v !== null);
+      if (!vals.length) return null;
+      return +((weight - Math.min(...vals))).toFixed(1);
+    };
+    prMax = hangPu('f-sc-pu-r1', 'f-sc-pu-r2');
+    plMax = hangPu('f-sc-pu-l1', 'f-sc-pu-l2');
+    sc_pu_r1 = gn('f-sc-pu-r1'); sc_pu_r2 = gn('f-sc-pu-r2');
+    sc_pu_l1 = gn('f-sc-pu-l1'); sc_pu_l2 = gn('f-sc-pu-l2');
+  } else {
+    prMax = mx(gn('f-pu-r1'), gn('f-pu-r2'));
+    plMax = mx(gn('f-pu-l1'), gn('f-pu-l2'));
+  }
+  const erR   = mx(gn('f-er-r1'), gn('f-er-r2'));
+  const erL   = mx(gn('f-er-l1'), gn('f-er-l2'));
+  const irR   = mx(gn('f-ir-r1'), gn('f-ir-r2'));
+  const irL   = mx(gn('f-ir-l1'), gn('f-ir-l2'));
+  const anR   = gn('f-an-r1');
+  const anL   = gn('f-an-l1');
+  const slR   = mx(gn('f-sl-r1'), gn('f-sl-r2'));
+  const slL   = mx(gn('f-sl-l1'), gn('f-sl-l2'));
+  const pct = (n) => n !== null ? +((n/bw)*100).toFixed(1) : null;
+
+  const savedId = CA_editingId;
+  CA_editingId = null;
+  CA_current = {
+    id: savedId || Date.now().toString(),
+    date: gs('f-date') || new Date().toISOString().slice(0,10),
+    name, age: gn('f-age'), height, weight,
+    dominant: document.getElementById('f-dominant').value,
+    gender: document.getElementById('f-gender').value,
+    years: gn('f-years'), grade: gs('f-grade'), injury: gs('f-injury'), condition: CA_cond,
+    bmi: +((weight/(height/100)**2).toFixed(1)),
+    fi_method: CA_fiMethod,
+    fi_r: frMax, fi_l: flMax, fi_r_pct: pct(frMax), fi_l_pct: pct(flMax),
+    fi_r1: gn('f-fi-r1'), fi_r2: gn('f-fi-r2'), fi_l1: gn('f-fi-l1'), fi_l2: gn('f-fi-l2'),
+    le_r: leRMax, le_l: leLMax, le_r_pct: pct(leRMax), le_l_pct: pct(leLMax),
+    le_r1: gn('f-le-r1'), le_r2: gn('f-le-r2'), le_l1: gn('f-le-l1'), le_l2: gn('f-le-l2'),
+    sc_added, sc_fi_r1, sc_fi_r2, sc_fi_l1, sc_fi_l2,
+    sc_le_r1, sc_le_r2, sc_le_l1, sc_le_l2,
+    endurance: gn('f-endurance'),
+    pu_method: CA_puMethod,
+    pu_r: prMax, pu_l: plMax, pu_r_pct: pct(prMax), pu_l_pct: pct(plMax),
+    pu_r1: gn('f-pu-r1'), pu_r2: gn('f-pu-r2'), pu_l1: gn('f-pu-l1'), pu_l2: gn('f-pu-l2'),
+    sc_pu_r1, sc_pu_r2, sc_pu_l1, sc_pu_l2,
+    er_r: erR, er_l: erL, ir_r: irR, ir_l: irL,
+    er_r1: gn('f-er-r1'), er_r2: gn('f-er-r2'), er_l1: gn('f-er-l1'), er_l2: gn('f-er-l2'),
+    ir_r1: gn('f-ir-r1'), ir_r2: gn('f-ir-r2'), ir_l1: gn('f-ir-l1'), ir_l2: gn('f-ir-l2'),
+    erir_r: (erR && irR) ? +((erR/irR).toFixed(2)) : null,
+    erir_l: (erL && irL) ? +((erL/irL).toFixed(2)) : null,
+    plank: gn('f-plank'), lr: gn('f-lr'),
+    agfr_r: gn('f-agfr-r'), agfr_l: gn('f-agfr-l'),
+    straddle: gn('f-straddle'),
+    an_r: anR, an_l: anL,
+    sl_r: slR, sl_l: slL,
+    sl_r1: gn('f-sl-r1'), sl_r2: gn('f-sl-r2'), sl_l1: gn('f-sl-l1'), sl_l2: gn('f-sl-l2'),
+    sl_rung: gn('f-sl-rung'), sl_dist: gn('f-sl-dist'),
+  };
+  CA_renderResult(CA_current);
+  CA_showScreen('result');
+}
+
+// ─── 評価ロジック ─────────────────────────────────────────────
+function CA_evalBMI(v) {
+  if (v === null) return null;
+  const ref = 'Watts et al. 2003 / Berta & Michailov 2025（エリート男性平均：20.5–21.5）';
+  if (v >= 18.5 && v <= 22.9) return {s:63, label:'良好',    cls:'badge-gd', txt:'クライマーに適した体組成です。', ref};
+  if (v < 18.5)               return {s:42, label:'低体重',  cls:'badge-lo', txt:'骨密度・筋量に注意してください。', ref};
+  if (v < 25)                 return {s:42, label:'やや高め', cls:'badge-lo', txt:'体重比が指力に影響する可能性があります。', ref};
+  return                            {s:30, label:'要注意',   cls:'badge-po', txt:'体組成の改善を検討してください。', ref};
+}
+function CA_evalFinger2h(pct, gender) {
+  // 両手デッドハング実測（片手換算：÷2でBerta規範値と比較）
+  if (pct === null) return null;
+  const norms = FINGER_NORMS[gender] || FINGER_NORMS.male;
+  const ref = 'Berta & Michailov 2025グレード別パーセンタイル表（片手MVC %BW）に基づく参考評価。両手DH測定値÷2を片手換算として使用（院内シリアル比較用）。';
+  const perHand = +(pct / 2).toFixed(1);
+  const [n0,n1,n2,n3] = norms;
+  if (perHand >= n3.p50) {
+    return {s:75, label:'V13以上相当', cls:'badge-ex', txt:`両手DH ${pct}%BW（片手換算 ${perHand}%BW）→ V13以上（5段〜）${CA_fingerPercentileRange(perHand,n3)}相当`, ref};
+  }
+  if (perHand >= n2.p50) {
+    return {s:75, label:'V9–V12相当', cls:'badge-ex', txt:`両手DH ${pct}%BW（片手換算 ${perHand}%BW）→ V9–V12（初段〜4段）${CA_fingerPercentileRange(perHand,n2)}相当`, ref};
+  }
+  if (perHand >= n1.p50) {
+    return {s:63, label:'V5–V8相当', cls:'badge-gd', txt:`両手DH ${pct}%BW（片手換算 ${perHand}%BW）→ V5–V8（2〜1級）${CA_fingerPercentileRange(perHand,n1)}相当`, ref};
+  }
+  if (perHand >= n0.p50) {
+    return {s:50, label:'V2–V4相当', cls:'badge-av', txt:`両手DH ${pct}%BW（片手換算 ${perHand}%BW）→ V2–V4（5〜3級）${CA_fingerPercentileRange(perHand,n0)}相当`, ref};
+  }
+  if (perHand >= n0.p10) {
+    return {s:42, label:'V2未満', cls:'badge-lo', txt:`両手DH ${pct}%BW（片手換算 ${perHand}%BW）→ V2–V4（5〜3級）下位25〜50%相当。指力強化を推奨。`, ref};
+  }
+  return {s:30, label:'要強化', cls:'badge-po', txt:`両手DH ${pct}%BW（片手換算 ${perHand}%BW）→ V2–V4の下位10%未満。指力強化が最優先です。`, ref};
+}
+// Berta & Michailov 2025 グレード別パーセンタイル表（片手MVC %BW、直腕・20mmエッジ）
+// ※ Berta原典は23mmエッジ。本測定は20mmエッジのため参考値として使用。
+const FINGER_NORMS = {
+  male: [
+    { label:'V2–V4（5〜3級）',    p10:60, p25:65, p50:70, p75:80, p90:90 },
+    { label:'V5–V8（2〜1級）',    p10:65, p25:72, p50:80, p75:90, p90:100 },
+    { label:'V9–V12（初段〜4段）', p10:80, p25:90, p50:100, p75:110, p90:120 },
+    { label:'V13以上（5段〜）',    p10:95, p25:100, p50:105, p75:120, p90:130 },
+  ],
+  female: [
+    { label:'V2–V4（5〜3級）',    p10:45, p25:55, p50:65, p75:75, p90:85 },
+    { label:'V5–V8（2〜1級）',    p10:60, p25:68, p50:78, p75:88, p90:95 },
+    { label:'V9–V12（初段〜4段）', p10:75, p25:85, p50:95, p75:105, p90:115 },
+    { label:'V13以上（5段〜）',    p10:88, p25:92, p50:100, p75:115, p90:125 },
+  ],
+};
+function CA_fingerPercentileRange(pct, n) {
+  if (pct >= n.p90) return '上位10%以内';
+  if (pct >= n.p75) return '上位25%以内';
+  if (pct >= n.p50) return '上位50%以内（中央値以上）';
+  if (pct >= n.p25) return '下位50%以内（中央値以下）';
+  if (pct >= n.p10) return '下位25%以内';
+  return '下位10%以内';
+}
+function CA_evalFinger(pct, gender) {
+  if (pct === null) return null;
+  const norms = FINGER_NORMS[gender] || FINGER_NORMS.male;
+  const ref = 'Berta & Michailov 2025（23mmエッジ7秒MVC・直腕・片手）に基づくグレード別パーセンタイル参考値。本測定は20mmエッジ・直腕・プルセンサーのため参考値として使用。左右差・経時変化のモニタリングに併用。';
+  const [n0,n1,n2,n3] = norms;
+  if (pct >= n3.p50) {
+    return {s:75, label:'V13以上相当', cls:'badge-ex', txt:`片手 ${pct}%BW → ${n3.label} ${CA_fingerPercentileRange(pct,n3)}（中央値${n3.p50}%BW）`, ref};
+  }
+  if (pct >= n2.p50) {
+    return {s:75, label:'V9–V12相当', cls:'badge-ex', txt:`片手 ${pct}%BW → ${n2.label} ${CA_fingerPercentileRange(pct,n2)}（中央値${n2.p50}%BW）`, ref, nextPct: n3.p50, nextLabel: 'V13以上', diffPct: +(n3.p50-pct).toFixed(1)};
+  }
+  if (pct >= n1.p50) {
+    return {s:63, label:'V5–V8相当', cls:'badge-gd', txt:`片手 ${pct}%BW → ${n1.label} ${CA_fingerPercentileRange(pct,n1)}（中央値${n1.p50}%BW）`, ref, nextPct: n2.p50, nextLabel: 'V9–V12', diffPct: +(n2.p50-pct).toFixed(1)};
+  }
+  if (pct >= n0.p50) {
+    return {s:50, label:'V2–V4相当', cls:'badge-av', txt:`片手 ${pct}%BW → ${n0.label} ${CA_fingerPercentileRange(pct,n0)}（中央値${n0.p50}%BW）`, ref, nextPct: n1.p50, nextLabel: 'V5–V8', diffPct: +(n1.p50-pct).toFixed(1)};
+  }
+  if (pct >= n0.p10) {
+    return {s:42, label:'V2未満', cls:'badge-lo', txt:`片手 ${pct}%BW → V2–V4（5〜3級）の下位25〜50%相当。指力強化を推奨（中央値${n0.p50}%BW）。`, ref, nextPct: n0.p50, nextLabel: 'V2–V4圏内', diffPct: +(n0.p50-pct).toFixed(1)};
+  }
+  return {s:30, label:'要強化', cls:'badge-po', txt:`片手 ${pct}%BW → V2–V4（5〜3級）下位10%未満（${n0.p10}%BW）。指力強化が最優先です。`, ref, nextPct: n0.p10, nextLabel: 'V2–V4下位10%', diffPct: +(n0.p10-pct).toFixed(1)};
+}
+function CA_evalEndurance(v) {
+  if (v === null) return null;
+  const ref = 'Berta & Michailov et al. 2025（7s on / 3s off インターミット）：上級V4–V7目安10–15セット、エリートV7–V10目安16–20セット';
+  if (v >= 16) return {s:75, label:'優秀',    cls:'badge-ex', txt:`${v}セット：エリート（V7–V10）レベルです。`, ref};
+  if (v >= 10) return {s:63, label:'良好',    cls:'badge-gd', txt:`${v}セット：上級〜エリート下位の持久力です。`, ref, nextStr:`あと ${16-v}セットで「優秀（エリートV7–V10）」レベルへ`};
+  if (v >= 7)  return {s:50, label:'平均',    cls:'badge-av', txt:`${v}セット：上級（V4–V7）水準です。`, ref, nextStr:`あと ${10-v}セットで「良好（上級〜エリート下位）」レベルへ`};
+  if (v >= 4)  return {s:42, label:'やや低い', cls:'badge-lo', txt:`${v}セット：持久力向上が推奨されます。`, ref, nextStr:`あと ${7-v}セットで「平均（上級V4–V7）」水準へ`};
+  return             {s:30, label:'要改善',   cls:'badge-po', txt:`${v}セット：指持久力トレーニングを強化してください。`, ref, nextStr:`あと ${4-v}セットで「やや低い」レベルへ`};
+}
+function CA_evalPull(pct) {
+  if (pct === null) return null;
+  const ref = '肘90°等尺性（HHD）。%BW学術規範値は未確立。利き手側を評価。左右差≥15%で要注意。';
+  if (pct >= 90) return {s:75, label:'優秀',    cls:'badge-ex', txt:`${pct}%BW：非常に高い上肢プル能力です。`, ref};
+  if (pct >= 75) return {s:63, label:'良好',    cls:'badge-gd', txt:`${pct}%BW：良好な上肢プル能力です。`, ref};
+  if (pct >= 60) return {s:50, label:'平均',    cls:'badge-av', txt:`${pct}%BW：標準的な上肢プルです。`, ref};
+  if (pct >= 45) return {s:42, label:'やや低い', cls:'badge-lo', txt:`${pct}%BW：上肢プル強化が推奨されます。`, ref};
+  return               {s:30, label:'要改善',   cls:'badge-po', txt:`${pct}%BW：上肢プルの強化が必要です。`, ref};
+}
+function CA_evalERIR(ratio) {
+  // 通常IR>ER（比<1.0）が正常。高比率（ER>IR）も低比率（IR過多）も異常。
+  if (ratio === null) return null;
+  const ref = 'Greenfield 1990（正常：0.65–0.75）/ Sheps 2009（クライマー平均：0.79）/ Bradley 2023';
+  if (ratio > 1.20) return {s:30, label:'要確認',   cls:'badge-po', txt:`ER/IR ${ratio}：ER>IR（通常IRが優位）。測定肢位の再確認・専門家評価を推奨。`, ref};
+  if (ratio > 1.05) return {s:42, label:'やや高い',  cls:'badge-lo', txt:`ER/IR ${ratio}：IR相対的弱化の可能性あり。肩甲下筋強化を検討してください。`, ref};
+  if (ratio >= 0.65) return {s:75, label:'良好',    cls:'badge-gd', txt:`ER/IR ${ratio}：正常範囲内（クライマー平均 0.79）。`, ref};
+  if (ratio >= 0.55) return {s:42, label:'やや低い', cls:'badge-lo', txt:`ER/IR ${ratio}：外旋筋強化が必要です（正常下限 0.65）。`, ref};
+  return                   {s:30, label:'要介入',   cls:'badge-po', txt:`ER/IR ${ratio}：肩インジャリーリスクあり。専門家評価を推奨します。`, ref};
+}
+function CA_evalCore(plank, lr) {
+  if (plank === null && lr === null) return null;
+  const ref = 'McGill 2007（プランク：エリート目安90–120秒）/ FSCレビュー（ハンギングLR：エリート目安15–20回）';
+  const sp = plank !== null ? (plank>=120?75:plank>=90?63:plank>=60?50:plank>=30?42:30) : 50;
+  const sl = lr    !== null ? (lr>=20?75:lr>=15?63:lr>=10?50:lr>=5?42:30)               : 50;
+  const s = Math.round((sp+sl)/2);
+  const parts = [plank!==null?`プランク${plank}秒`:'', lr!==null?`LR${lr}回`:''].filter(Boolean).join('・');
+  const txt = `${parts}：${s>=63?'体幹は良好な水準です。':s>=50?'体幹は平均的です。継続強化を推奨します。':'体幹強化が必要です。'}`;
+  return {s, label: s>=75?'優秀':s>=63?'良好':s>=50?'平均':s>=42?'やや低い':'要改善', cls: bcls(s), txt, ref};
+}
+function CA_evalAGFR(cm) {
+  if (cm === null) return null;
+  const ref = 'Draper et al.（AGFR）：初級平均 103.7cm / エリート平均 114.0cm。左右差≥5cmで注意。';
+  if (cm >= 114) return {s:75, label:'優秀',    cls:'badge-ex', txt:`${cm}cm：エリートレベル（≥114cm）の股関節可動性です。`, ref};
+  if (cm >= 108) return {s:63, label:'良好',    cls:'badge-gd', txt:`${cm}cm：良好な股関節可動性です（初級〜エリート中間以上）。`, ref};
+  if (cm >= 103) return {s:50, label:'平均',    cls:'badge-av', txt:`${cm}cm：初級平均（103.7cm）水準。フロッグストレッチを継続してください。`, ref};
+  if (cm >= 90)  return {s:42, label:'やや低い', cls:'badge-lo', txt:`${cm}cm：初級平均（103.7cm）を下回ります。股関節複合可動域の改善が必要です。`, ref};
+  return               {s:30, label:'要改善',   cls:'badge-po', txt:`${cm}cm：股関節可動性が大きく不足しています。日常的なストレッチを推奨します。`, ref};
+}
+function CA_evalStraddle(cm) {
+  if (cm === null) return null;
+  const ref = 'Draga et al.（Straddle-Stand）：エリート平均 38.2cm（距離が小さいほど優秀）';
+  if (cm <= 38) return {s:75, label:'優秀',    cls:'badge-ex', txt:`${cm}cm：エリート平均（38.2cm）以内の優れた可動性です。`, ref};
+  if (cm <= 44) return {s:63, label:'良好',    cls:'badge-gd', txt:`${cm}cm：良好な股関節開脚可動性です。`, ref};
+  if (cm <= 52) return {s:50, label:'平均',    cls:'badge-av', txt:`${cm}cm：エリート平均より${(cm-38.2).toFixed(1)}cm大きい状態です。`, ref};
+  if (cm <= 60) return {s:42, label:'やや低い', cls:'badge-lo', txt:`${cm}cm：股関節開脚可動域の改善が推奨されます。`, ref};
+  return             {s:30, label:'要改善',   cls:'badge-po', txt:`${cm}cm：股関節開脚制限あり。専門的なストレッチを推奨します。`, ref};
+}
+function CA_evalAnkle(cm) {
+  if (cm === null) return null;
+  const ref = 'Bennell et al. 1998 / 理学療法科学 2008（WBLT母趾-壁距離）：健常若年男性平均12.0±3.0cm / クライミング目標≥12cm / 臨床下限9cm / 左右差≥1.5cmで注意';
+  if (cm >= 14) return {s:75, label:'優秀',    cls:'badge-ex', txt:`${cm}cm：優れた足首背屈可動性です（≥14cm）。`, ref};
+  if (cm >= 12) return {s:63, label:'良好',    cls:'badge-gd', txt:`${cm}cm：クライミング目標（≥12cm）を達成しています。`, ref};
+  if (cm >= 9)  return {s:42, label:'やや低い', cls:'badge-lo', txt:`${cm}cm：クライミング目標（12cm）未達。WBLTストレッチを継続してください。`, ref};
+  return             {s:30, label:'要改善',   cls:'badge-po', txt:`${cm}cm：臨床的な背屈制限（<9cm）。専門家評価を推奨します。`, ref};
+}
+function evalSlap(cm) {
+  if (cm === null) return null;
+  const ref = 'Draper et al. 2011（IJSPP）/ Sas-Nowosielski et al. 2023 / Stien et al. 2022。ナローグリップ・反動なし・スタートラングからチョーク跡までの距離。グレードとの相関 r=0.69–0.73、ICC 0.95–0.98。';
+  if (cm >= 75) return {s:75, label:'Elite相当',    cls:'badge-ex', txt:`${cm}cm → Elite（V9–V12+・75–90cm以上）レベルの上肢パワー。`, ref};
+  if (cm >= 55) return {s:63, label:'Advanced相当', cls:'badge-gd', txt:`${cm}cm → Advanced（V5–V9・55–75cm）レベルの上肢パワー。`, ref, nextStr:`あと ${75-cm}cmで「Elite（V9–V12+）」レベルへ`};
+  if (cm >= 35) return {s:50, label:'Intermediate相当', cls:'badge-av', txt:`${cm}cm → Intermediate（V1–V4・35–55cm）レベルの上肢パワー。`, ref, nextStr:`あと ${55-cm}cmで「Advanced（V5–V9）」レベルへ`};
+  return             {s:30, label:'Novice相当',   cls:'badge-po', txt:`${cm}cm → Novice（〜V1・35cm未満）レベル。爆発的上肢パワーの強化が必要です。`, ref, nextStr:`あと ${35-cm}cmで「Intermediate（V1–V4）」レベルへ`};
+}
+const bcls = s => s>=75?'badge-ex':s>=63?'badge-gd':s>=50?'badge-av':s>=42?'badge-lo':'badge-po';
+
+function CA_calcEval(r) {
+  const dominant = r.dominant;
+  const fiAvgPct = (r.fi_r_pct!==null && r.fi_l_pct!==null) ? (r.fi_r_pct+r.fi_l_pct)/2 : (r.fi_r_pct??r.fi_l_pct);
+  const fingerEv = CA_evalFinger(fiAvgPct, r.gender);
+  const puDom    = dominant==='left' ? r.pu_l_pct : r.pu_r_pct;
+  const erirAvg  = (r.erir_r!==null && r.erir_l!==null) ? (r.erir_r+r.erir_l)/2 : (r.erir_r??r.erir_l);
+  const agfrMin  = (r.agfr_r!==null && r.agfr_l!==null) ? Math.min(r.agfr_r, r.agfr_l) : (r.agfr_r??r.agfr_l);
+  const anMin    = (r.an_r!==null && r.an_l!==null) ? Math.min(r.an_r, r.an_l) : (r.an_r??r.an_l);
+  const slDom    = dominant==='left' ? r.sl_l : r.sl_r;
+  return {
+    bmi:       CA_evalBMI(r.bmi),
+    finger:    fingerEv,
+    endurance: CA_evalEndurance(r.endurance),
+    pull:      CA_evalPull(puDom),
+    erir:      CA_evalERIR(erirAvg),
+    core:      CA_evalCore(r.plank, r.lr),
+    agfr:      CA_evalAGFR(agfrMin),
+    straddle:  CA_evalStraddle(r.straddle),
+    ankle:     CA_evalAnkle(anMin),
+    slap:      evalSlap(slDom),
+  };
+}
+
+function radarScores(r) {
+  const e = CA_calcEval(r);
+  return [e.finger,e.endurance,e.pull,e.erir,e.core,e.agfr,e.straddle,e.ankle,e.slap].map(x => x?.s ?? 50);
+}
+
+// ─── 結果画面レンダリング ─────────────────────────────────────
+function CA_renderResult(r, cmpId) {
+  CA_load();
+  const ev = CA_calcEval(r);
+  const scores = radarScores(r);
+
+  // 指力：次グレードまでのkg換算を付与
+  if (ev.finger?.nextPct !== undefined) {
+    const diffKg = +(ev.finger.diffPct * r.weight / 100).toFixed(1);
+    ev.finger.nextStr = `片手 +${ev.finger.diffPct}%BW（+${diffKg}kg）で「${ev.finger.nextLabel}」中央値に到達`;
+  }
+
+  const meta = [r.age?r.age+'歳':'', r.bmi?'BMI '+r.bmi:'', r.dominant==='left'?'左利き':'右利き', r.grade?'B:'+r.grade:'', r.years?r.years+'年目':''].filter(Boolean).join('　');
+
+  // 左右差チェック
+  const diffs = [];
+  if (r.fi_r_pct!==null && r.fi_l_pct!==null && Math.abs(r.fi_r_pct-r.fi_l_pct)>=15)
+    diffs.push(`指力左右差 ${Math.abs(r.fi_r_pct-r.fi_l_pct).toFixed(1)}%（基準15%超）`);
+  if (r.pu_r_pct!==null && r.pu_l_pct!==null) {
+    const big = Math.max(r.pu_r_pct, r.pu_l_pct);
+    const d = big>0 ? Math.abs(r.pu_r_pct-r.pu_l_pct)/big*100 : 0;
+    if (d >= 15) diffs.push(`上肢プル左右差 ${d.toFixed(1)}%（基準15%超）`);
+  }
+  if (r.agfr_r!==null && r.agfr_l!==null && Math.abs(r.agfr_r-r.agfr_l)>=5)
+    diffs.push(`AGFR左右差 ${Math.abs(r.agfr_r-r.agfr_l).toFixed(1)}cm（基準5cm超）`);
+  if (r.an_r!==null && r.an_l!==null && Math.abs(r.an_r-r.an_l)>=1.5)
+    diffs.push(`足首背屈左右差 ${Math.abs(r.an_r-r.an_l).toFixed(1)}cm（基準1.5cm超）`);
+
+  // 強み・弱点
+  const items = [
+    ['①指力',ev.finger], ['②持久力',ev.endurance], ['③上肢プル',ev.pull],
+    ['④肩ER/IR',ev.erir], ['⑤体幹',ev.core], ['⑥AGFR',ev.agfr],
+    ['⑦Straddle',ev.straddle], ['⑧足首',ev.ankle],
+  ].filter(([,e]) => e!==null);
+  const strengths  = items.filter(([,e]) => e.s >= 63).map(([n]) => n);
+  const weaknesses = items.filter(([,e]) => e.s <= 42).map(([n]) => n);
+
+  // 比較セレクト
+  const sameRecs  = CA_records.filter(x => x.id!==r.id && x.name===r.name).sort((a,b)=>b.date.localeCompare(a.date));
+  const otherRecs = CA_records.filter(x => x.id!==r.id && x.name!==r.name).sort((a,b)=>b.date.localeCompare(a.date));
+  const cmpOpts = [
+    '<option value="">（比較なし）</option>',
+    ...sameRecs.map(x => `<option value="${x.id}" ${cmpId===x.id?'selected':''}>${CA_fmtDate(x.date)}</option>`),
+    ...otherRecs.map(x => `<option value="${x.id}" ${cmpId===x.id?'selected':''}>${x.name}（${CA_fmtDate(x.date)}）</option>`),
+  ].join('');
+
+  document.getElementById('ca-result-body').innerHTML = `
+    <div class="result-profile">
+      <div class="result-name">${r.name}</div>
+      <div class="result-meta">${meta}</div>
+      ${r.injury ? `<div class="result-meta">傷害歴: ${r.injury}</div>` : ''}
+      <div class="result-meta">${CA_fmtDate(r.date)}</div>
+    </div>
+    ${r.condition==='tired' ? `<div class="CA_cond-note">⚠️ <strong>疲労あり：</strong>②③は過少評価の可能性があります。標準コンディションで再測定を推奨します。</div>` : ''}
+    <div class="compare-bar" style="margin-top:10px;">
+      <label>比較：</label>
+      <select id="cmp-sel" onchange="updateChart(this.value)">${cmpOpts}</select>
+    </div>
+    <div class="CA_chart-wrap"><canvas id="radar-CA_chart" width="320" height="260"></canvas></div>
+    <div class="summary-box">
+      <div class="summary-half">
+        <div class="summary-title good">💪 強み</div>
+        ${strengths.length ? strengths.map(s=>`<div class="summary-item">✓ ${s}</div>`).join('') : '<div class="summary-item">—</div>'}
+      </div>
+      <div class="summary-half">
+        <div class="summary-title weak">⚠ 要強化</div>
+        ${weaknesses.length ? weaknesses.map(s=>`<div class="summary-item">△ ${s}</div>`).join('') : '<div class="summary-item">—</div>'}
+      </div>
+    </div>
+    ${diffs.length ? `<div class="diff-note"><strong>左右差注意：</strong><br>${diffs.join('<br>')}</div>` : ''}
+    <div class="card">
+      <div class="card-header">評価結果一覧</div>
+      <div style="overflow-x:auto;">
+        <table class="eval-table">
+          <thead><tr><th style="width:20%">項目</th><th style="width:28%">測定値</th><th>コメント</th><th style="width:14%">評価</th></tr></thead>
+          <tbody>
+            ${eRow('⓪ BMI', r.bmi?`${r.bmi}`:'—', ev.bmi)}
+            ${eRow('① 指力', (() => {
+              const parts = [];
+              if (r.fi_r !== null) parts.push(`右 ${r.fi_r}kg（${r.fi_r_pct}%BW）`);
+              if (r.fi_l !== null) parts.push(`左 ${r.fi_l}kg（${r.fi_l_pct}%BW）`);
+              if (r.le_r !== null || r.le_l !== null) {
+                parts.push(`<span style="color:#777;font-size:11px;">LE: ${r.le_r!==null?`右${r.le_r}kg（${r.le_r_pct}%BW）`:''}${r.le_r!==null&&r.le_l!==null?' / ':''}${r.le_l!==null?`左${r.le_l}kg（${r.le_l_pct}%BW）`:''}</span>`);
+              }
+              return parts.join('<br>') || '—';
+            })(), ev.finger)}
+            ${eRow('② 持久力', r.endurance!==null?`${r.endurance}セット`:'—', ev.endurance)}
+            ${eRow('③ 上肢プル', [r.pu_r!==null?`右 ${r.pu_r}kg<br>${r.pu_r_pct}%BW`:'', r.pu_l!==null?`左 ${r.pu_l}kg<br>${r.pu_l_pct}%BW`:''].filter(Boolean).join('<br>')||'—', ev.pull)}
+            ${eRow('④ 肩ER/IR', [r.erir_r!==null?`右 ${r.erir_r}`:'', r.erir_l!==null?`左 ${r.erir_l}`:''].filter(Boolean).join('<br>')||'—', ev.erir, sideBadges(r.erir_r, r.erir_l, evalERIR))}
+            ${eRow('⑤ 体幹', [r.plank!==null?`プランク ${r.plank}秒`:'', r.lr!==null?`LR ${r.lr}回`:''].filter(Boolean).join('<br>')||'—', ev.core)}
+            ${eRow('⑥ AGFR', [r.agfr_r!==null?`右 ${r.agfr_r}cm`:'', r.agfr_l!==null?`左 ${r.agfr_l}cm`:''].filter(Boolean).join('<br>')||'—', ev.agfr, sideBadges(r.agfr_r, r.agfr_l, evalAGFR))}
+            ${eRow('⑦ Straddle', r.straddle!==null?`${r.straddle}cm`:'—', ev.straddle)}
+            ${eRow('⑧ 足首背屈', [r.an_r!==null?`右 ${r.an_r}cm`:'', r.an_l!==null?`左 ${r.an_l}cm`:''].filter(Boolean).join('<br>')||'—', ev.ankle, sideBadges(r.an_r, r.an_l, evalAnkle))}
+            ${(r.sl_r!==null||r.sl_l!==null) ? eRow('⑨ パワースラップ', [r.sl_r!==null?`右 ${r.sl_r}cm`:'', r.sl_l!==null?`左 ${r.sl_l}cm`:''].filter(Boolean).join('<br>'), ev.slap) : ''}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="action-area">
+      <button class="btn btn-accent btn-block" onclick="CA_saveRecord()">💾　この結果を保存</button>
+      <button class="btn btn-block" style="background:#e8f5e9;color:#2e7d32;border:1.5px solid #81c784;" onclick="CA_openModal('modal-prompt')">🤖　AIプロンプト生成</button>
+      ${CA_current && CA_records.find(x=>x.id===CA_current.id) ? `<button class="btn btn-outline btn-block" onclick="CA_editRecord()">✏️　編集・追記</button>` : ''}
+      <button class="btn btn-outline btn-block" onclick="CA_showScreen('home')">← ホームに戻る</button>
+      ${CA_current && CA_records.find(x=>x.id===CA_current.id) ? `<button class="btn btn-block" style="background:#ffebee;color:#c62828;border:1.5px solid #e57373;" onclick="CA_deleteRecord('${CA_current.id}')">🗑　この記録を削除</button>` : ''}
+    </div>
+  `;
+
+  drawChart(scores, r.name, cmpId);
+}
+
+function eRow(name, val, ev, extraBadges='') {
+  if (!ev) return `<tr><td style="font-weight:bold;font-size:14px;">${name}</td><td style="font-size:13px;">${val||'—'}</td><td style="font-size:13px;color:#888;">—</td><td><span class="badge badge-na">未入力</span></td></tr>`;
+  const refHtml = ev.ref ? `<div style="font-size:11px;color:#999;margin-top:4px;">📖 ${ev.ref}</div>` : '';
+  const nextHtml = ev.nextStr ? `<div style="font-size:11px;color:#1565c0;background:#e3f2fd;padding:3px 8px;border-radius:4px;margin-top:5px;display:inline-block;">📈 ${ev.nextStr}</div>` : '';
+  const badgeCol = extraBadges || `<span class="badge ${ev.cls}">${ev.label}</span>`;
+  return `<tr><td style="font-weight:bold;font-size:14px;">${name}</td><td style="font-size:13px;">${val}</td><td style="font-size:14px;color:#555;">${ev.txt}${nextHtml}${refHtml}</td><td>${badgeCol}</td></tr>`;
+}
+function sideBadges(rVal, lVal, evalFn) {
+  const parts = [];
+  if (rVal !== null) { const e = evalFn(rVal); parts.push(`<div>右 <span class="badge ${e.cls}">${e.label}</span></div>`); }
+  if (lVal !== null) { const e = evalFn(lVal); parts.push(`<div>左 <span class="badge ${e.cls}">${e.label}</span></div>`); }
+  return parts.join('');
+}
+
+// ─── レーダーチャート ─────────────────────────────────────────
+function drawChart(scores, name, cmpId) {
+  const ctx = document.getElementById('radar-CA_chart');
+  if (!ctx) return;
+  if (CA_chart) { CA_chart.destroy(); CA_chart = null; }
+  const labels = ['①指力','②持久力','③上肢プル','④肩ER/IR','⑤体幹','⑥AGFR','⑦Straddle','⑧足首','⑨スラップ'];
+  const datasets = [{
+    label: name, data: scores,
+    backgroundColor: 'rgba(46,64,87,0.15)', borderColor: 'rgba(46,64,87,0.9)', borderWidth: 2,
+    pointBackgroundColor: scores.map(s => s<=30?'#c62828':s>=63?'#2e7d32':'#e65100'), pointRadius: 5,
+  }];
+  if (cmpId) {
+    const c = CA_records.find(x => x.id===cmpId);
+    if (c) {
+      const cs = radarScores(c);
+      datasets.push({
+        label: `${c.name}（${CA_fmtDate(c.date)}）`, data: cs,
+        backgroundColor: 'rgba(74,127,203,0.08)', borderColor: 'rgba(74,127,203,0.7)',
+        borderWidth: 2, borderDash: [5,4],
+        pointBackgroundColor: 'rgba(74,127,203,0.7)', pointRadius: 4,
+      });
+    }
+  }
+  CA_chart = new Chart(ctx, {
+    type: 'radar', data: { labels, datasets },
+    options: {
+      responsive: false,
+      scales: { r: {
+        min: 20, max: 80,
+        ticks: { stepSize:10, font:{size:8}, callback: v=>({30:'要改善',42:'やや低い',50:'平均',63:'良好',75:'優秀'}[v]||'') },
+        pointLabels: { font:{size:9} },
+        grid: { color:'rgba(0,0,0,0.07)' }
+      }},
+      plugins: {
+        legend: { display:true, position:'bottom', labels:{font:{size:10},boxWidth:12} },
+        tooltip: { callbacks: { label: c=>`${c.dataset.label}: ${({30:'要改善',42:'やや低い',50:'平均',63:'良好',75:'優秀'}[c.raw]||c.raw)}` } }
+      }
+    }
+  });
+}
+
+function updateChart(cmpId) {
+  if (!CA_current) return;
+  drawChart(radarScores(CA_current), CA_current.name, cmpId||null);
+}
+
+// ─── 保存・閲覧 ───────────────────────────────────────────────
+function CA_saveRecord() {
+  if (!CA_current) return;
+  CA_load();
+  const idx = CA_records.findIndex(x => x.id===CA_current.id);
+  if (idx >= 0) { CA_records[idx] = CA_current; alert('更新しました。'); }
+  else          { CA_records.push(CA_current);  alert('保存しました。'); }
+  CA_store();
+}
+
+function CA_deleteRecord(id) {
+  if (!confirm('この記録を削除しますか？')) return;
+  CA_load();
+  CA_records = CA_records.filter(x => x.id !== id);
+  CA_store();
+  if (CA_current && CA_current.id === id) { CA_current = null; CA_showScreen('home'); }
+  else { CA_renderHome(); }
+}
+
+function CA_viewRecord(id) {
+  CA_load();
+  const r = CA_records.find(x => x.id===id);
+  if (!r) return;
+  CA_current = r;
+  CA_renderResult(r);
+  CA_showScreen('result');
+}
+
+function CA_editRecord() {
+  if (!CA_current) return;
+  const r = CA_current;
+  CA_editingId = r.id;
+  CA_resetForm();
+  const sv = (id, val) => { const el = document.getElementById(id); if (el && val !== null && val !== undefined) el.value = val; };
+  CA_sv('f-name', r.name);
+  CA_sv('f-age', r.age);
+  CA_sv('f-height', r.height);
+  CA_sv('f-weight', r.weight);
+  CA_sv('f-date', r.date);
+  CA_sv('f-years', r.years);
+  CA_sv('f-grade', r.grade);
+  CA_sv('f-injury', r.injury);
+  const genderEl = document.getElementById('f-gender');
+  if (genderEl && r.gender) genderEl.value = r.gender;
+  const domEl = document.getElementById('f-dominant');
+  if (domEl && r.dominant) domEl.value = r.dominant;
+  CA_cond = r.condition || 'normal';
+  document.querySelectorAll('#CA_cond-group .radio-btn').forEach(b => {
+    b.classList.toggle('checked', b.getAttribute('onclick').includes(`'${CA_cond}'`));
+  });
+  const method = r.fi_method || 'sensor';
+  CA_setFiMethod(method, document.getElementById('fi-method-' + method));
+  if (method === 'scale') {
+    CA_sv('f-sc-added',  r.sc_added);
+    CA_sv('f-sc-fi-r1',  r.sc_fi_r1); CA_sv('f-sc-fi-r2', r.sc_fi_r2);
+    CA_sv('f-sc-fi-l1',  r.sc_fi_l1); CA_sv('f-sc-fi-l2', r.sc_fi_l2);
+    CA_sv('f-sc-le-r1',  r.sc_le_r1); CA_sv('f-sc-le-r2', r.sc_le_r2);
+    CA_sv('f-sc-le-l1',  r.sc_le_l1); CA_sv('f-sc-le-l2', r.sc_le_l2);
+    CA_updateScaleCalc();
+  } else {
+    CA_sv('f-fi-r1', r.fi_r1); CA_sv('f-fi-r2', r.fi_r2);
+    CA_sv('f-fi-l1', r.fi_l1); CA_sv('f-fi-l2', r.fi_l2);
+    CA_sv('f-le-r1', r.le_r1); CA_sv('f-le-r2', r.le_r2);
+    CA_sv('f-le-l1', r.le_l1); CA_sv('f-le-l2', r.le_l2);
+  }
+  CA_sv('f-endurance', r.endurance);
+  const puMeth = r.pu_method || 'sensor';
+  CA_setPuMethod(puMeth, document.getElementById('pu-method-' + puMeth));
+  if (puMeth === 'scale') {
+    CA_sv('f-sc-pu-r1', r.sc_pu_r1); CA_sv('f-sc-pu-r2', r.sc_pu_r2);
+    CA_sv('f-sc-pu-l1', r.sc_pu_l1); CA_sv('f-sc-pu-l2', r.sc_pu_l2);
+    CA_updateScaleCalc();
+  } else {
+    CA_sv('f-pu-r1', r.pu_r1); CA_sv('f-pu-r2', r.pu_r2);
+    CA_sv('f-pu-l1', r.pu_l1); CA_sv('f-pu-l2', r.pu_l2);
+  }
+  CA_sv('f-er-r1', r.er_r1); CA_sv('f-er-r2', r.er_r2);
+  CA_sv('f-er-l1', r.er_l1); CA_sv('f-er-l2', r.er_l2);
+  CA_sv('f-ir-r1', r.ir_r1); CA_sv('f-ir-r2', r.ir_r2);
+  CA_sv('f-ir-l1', r.ir_l1); CA_sv('f-ir-l2', r.ir_l2);
+  CA_sv('f-plank', r.plank); CA_sv('f-lr', r.lr);
+  CA_sv('f-agfr-r', r.agfr_r); CA_sv('f-agfr-l', r.agfr_l);
+  CA_sv('f-straddle', r.straddle);
+  CA_sv('f-an-r1', r.an_r); CA_sv('f-an-l1', r.an_l);
+  CA_sv('f-sl-r1', r.sl_r1); CA_sv('f-sl-r2', r.sl_r2);
+  CA_sv('f-sl-l1', r.sl_l1); CA_sv('f-sl-l2', r.sl_l2);
+  CA_sv('f-sl-rung', r.sl_rung); CA_sv('f-sl-dist', r.sl_dist);
+  document.getElementById('ca-step-jump-bar').style.display = '';
+  document.getElementById('ca-btn-step-save').style.display = '';
+  document.getElementById('ca-form-screen-title').textContent = '編集・追記';
+  CA_goToStep(1);
+  CA_showScreen('form');
+}
+
+function CA_submitAndSave() {
+  CA_submitForm();
+  // submitForm sets CA_current; auto-save to localStorage
+  if (CA_current) {
+    CA_load();
+    const idx = CA_records.findIndex(x => x.id === CA_current.id);
+    if (idx >= 0) CA_records[idx] = CA_current; else CA_records.push(CA_current);
+    CA_store();
+  }
+}
+
+// ─── AIプロンプト生成 ─────────────────────────────────────────
+function CA_generatePrompt() {
+  const r = CA_current;
+  if (!r) return;
+  const ev = CA_calcEval(r);
+  const targetGrade  = document.getElementById('ca-pm-target-grade').value  || '未設定';
+  const duration     = document.getElementById('ca-pm-duration').value     || '未設定';
+  const targetWeight = document.getElementById('ca-pm-target-weight').value;
+  const freq         = document.getElementById('ca-pm-freq').value;
+  const notes        = document.getElementById('ca-pm-notes').value;
+  const genderLabel = r.gender === 'female' ? '女性' : '男性';
+  const condLabel   = {good:'絶好調', normal:'普通', tired:'疲労あり'}[r.condition] || '普通';
+
+  const line = (label, val) => val ? `・${label}：${val}` : '';
+  const evLine = (label, ev, val) => {
+    if (!ev || val === null || val === undefined) return `・${label}：未測定`;
+    return `・${label}：${val}　→　${ev.label}（${ev.txt.replace(/<[^>]+>/g,'')}）`;
+  };
+
+  const fingerVal = (() => {
+    const parts = [];
+    if (r.fi_r !== null) parts.push(`右${r.fi_r}kg（${r.fi_r_pct}%BW）`);
+    if (r.fi_l !== null) parts.push(`左${r.fi_l}kg（${r.fi_l_pct}%BW）`);
+    if (r.le_r !== null) parts.push(`LE右${r.le_r}kg（${r.le_r_pct}%BW）`);
+    if (r.le_l !== null) parts.push(`LE左${r.le_l}kg（${r.le_l_pct}%BW）`);
+    return parts.join('　') || '未測定';
+  })();
+
+  const prompt = `あなたはスポーツクライミングの専門トレーナーです。以下のフィジカル評価結果をもとに、パーソナライズされたトレーニングプログラムを作成してください。
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+【プロフィール】
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+${line('氏名', r.name)}
+${line('性別', genderLabel)}
+${line('年齢', r.age ? r.age + '歳' : null)}
+${line('身長 / 体重 / BMI', `${r.height}cm / ${r.weight}kg / BMI ${r.bmi}`)}
+${line('クライミング歴', r.years ? r.years + '年' : null)}
+${line('現在の最高グレード', r.grade)}
+${line('傷害歴・既往歴', r.injury)}
+${line('測定日コンディション', condLabel)}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+【フィジカル評価結果（${r.date}）】
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+・① 指力MVC（片手直腕・20mmエッジ）：${fingerVal}　→　${ev.finger ? ev.finger.label + '（' + ev.finger.txt.replace(/<[^>]+>/g,'') + '）' : '未評価'}
+${evLine('② 指持久力', ev.endurance, r.endurance !== null ? r.endurance + 'セット' : null)}
+${evLine('③ 上肢プル（利き手）', ev.pull, (() => { const v = r.dominant==='left'?r.pu_l:r.pu_r; const p = r.dominant==='left'?r.pu_l_pct:r.pu_r_pct; return v !== null ? v + 'kg（' + p + '%BW）' : null; })())}
+${evLine('④ 肩ER/IR比', ev.erir, r.erir_r !== null || r.erir_l !== null ? [r.erir_r !== null ? '右'+r.erir_r : '', r.erir_l !== null ? '左'+r.erir_l : ''].filter(Boolean).join(' / ') : null)}
+${evLine('⑤ 体幹', ev.core, [r.plank !== null ? 'プランク'+r.plank+'秒' : '', r.lr !== null ? 'LR'+r.lr+'回' : ''].filter(Boolean).join(' / ') || null)}
+${evLine('⑥ AGFR', ev.agfr, r.agfr_r !== null || r.agfr_l !== null ? [r.agfr_r !== null ? '右'+r.agfr_r+'cm' : '', r.agfr_l !== null ? '左'+r.agfr_l+'cm' : ''].filter(Boolean).join(' / ') : null)}
+${evLine('⑦ Straddle', ev.straddle, r.straddle !== null ? r.straddle + 'cm' : null)}
+${evLine('⑧ 足首背屈（WBLT）', ev.ankle, r.an_r !== null || r.an_l !== null ? [r.an_r !== null ? '右'+r.an_r+'cm' : '', r.an_l !== null ? '左'+r.an_l+'cm' : ''].filter(Boolean).join(' / ') : null)}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+【目標・条件】
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+・目標グレード：${targetGrade}
+・期間：${duration}
+・クライミング頻度：${freq}
+・現在体重：${r.weight}kg${targetWeight ? `　→　目標体重：${targetWeight}kg（差：${(r.weight - targetWeight).toFixed(1)}kg）` : ''}${notes ? '\n・特記事項：' + notes : ''}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+【評価指標の解釈ガイド（必ずこの定義で解釈してください）】
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+■ ④ 肩ER/IR比（外旋/内旋筋力比）
+・定義：ER/IR比 = 肩外旋筋力（N）÷ 肩内旋筋力（N）
+・測定肢位：肩90°外転・肘90°屈曲（90/90位）HHD測定
+・正常方向：内旋（IR）が外旋（ER）より強いため、比率は1.0未満が正常
+・正常範囲：0.65–1.05（Greenfield 1990）
+・クライマー平均：0.79（Sheps 2009）
+・比率 > 1.05：ER優位 → 内旋筋（肩甲下筋）の相対的弱化。クライミングでは内旋動作が多いため機能制限リスクあり。肩甲下筋強化を優先。
+・比率 > 1.20：著明なER優位 → 肩のバランス異常。専門家評価を推奨。
+・比率 < 0.65：ER過度低下 → 外旋筋（棘下筋・小円筋）弱化。肩後方安定性低下リスク。
+・【注意】比率が高い（ER優位）＝外旋が相対的に強い＝内旋が弱い、という意味であり、「外旋が強いから問題ない」と解釈してはならない。
+
+■ ⑦ Straddle-Stand（恥骨-壁距離）
+・定義：壁に正対して最大開脚立位をとり、恥骨結合から壁までの距離（cm）を測定
+・判定方向：値が小さいほど股関節外転可動域が広い（＝優秀）
+・基準値：エリートクライマー平均 38.2cm（Draga et al.）
+・38cm以下：エリートレベルの開脚可動性
+・38–44cm：良好
+・44–52cm：平均的（改善余地あり）
+・52cm超：要改善
+・クライミングへの関連：ハイステップ・フラッグ・シーケンスの自由度に直結。値が大きい（硬い）ほどムーブの選択肢が狭まる。
+・【注意】「38cmで良好」ではなく「38cmだから優秀」。数値が大きいほど問題がある。
+
+■ ⑨ パワースラップ（キャンパスボード）
+・定義：ナローグリップ・肘伸展フルエクステンションスタート・反動なし・片手チョーク跡距離（cm）
+・根拠：Draper et al. 2011（IJSPP）/ Sas-Nowosielski et al. 2023 / Stien et al. 2022
+・信頼性：ICC 0.95–0.98、グレードとの相関 r = 0.69–0.73
+・グレード別基準（暫定）:
+　Novice（〜V1）：35cm未満
+　Intermediate（V1–V4）：35–55cm
+　Advanced（V5–V9）：55–75cm
+　Elite（V9–V12+）：75–90cm以上
+・測定値はスタートラングからチョーク跡までの距離（cm）。高いほど優秀。
+・左右差10cm以上は弱側の上肢パワー不足として介入対象。
+・指力・プル力との組み合わせでボトルネック特定に有用。
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+【作成してほしい内容】
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. 現状の強み・弱点の分析（評価データに基づいて）
+2. 目標グレードに向けた優先改善項目（上位3つ）
+3. 週間トレーニングスケジュール（クライミングセッション含む）
+4. 各弱点に対する具体的なエクササイズ（種目・セット数・回数・強度・頻度）
+5. ${duration}間の段階的プログレッション（月ごとの目安）
+6. 怪我予防・コンディショニングの注意点
+7. 次回フィジカルチェックで確認すべき指標
+
+できる限り具体的な数値や方法を示してください。`;
+
+  document.getElementById('ca-pm-text').value = prompt.replace(/^[ \t]*\n/gm, '\n').trim();
+  document.getElementById('ca-pm-result').style.display = 'block';
+  document.getElementById('ca-pm-copy-ok').style.display = 'none';
+}
+
+function CA_copyPrompt() {
+  const text = document.getElementById('ca-pm-text');
+  text.select();
+  text.setSelectionRange(0, 99999);
+  navigator.clipboard.writeText(text.value).catch(() => document.execCommand('copy'));
+  document.getElementById('ca-pm-copy-ok').style.display = 'block';
+  setTimeout(() => { document.getElementById('ca-pm-copy-ok').style.display = 'none'; }, 2000);
+}
+
+// ─── 初期化 ───────────────────────────────────────────────────
+CA_load();
+CA_renderHome();
+
+
+
 </script>
+
 </body>
 </html>
