@@ -2561,7 +2561,8 @@ function CA_updateScaleCalc() {
 
 function CA_setCond(val, el) {
   CA_cond = val;
-  document.querySelectorAll('#CA_cond-group .radio-btn').forEach(b => b.classList.remove('checked'));
+  const group = el.closest('.ca-radio-group') || document.getElementById('ca-cond-group');
+  if (group) group.querySelectorAll('.ca-radio-btn').forEach(b => b.classList.remove('checked'));
   el.classList.add('checked');
 }
 
@@ -2581,7 +2582,7 @@ function CA_resetForm() {
   ids.forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
   document.getElementById('f-date').value = new Date().toISOString().slice(0,10);
   CA_cond = 'normal';
-  document.querySelectorAll('#CA_cond-group .radio-btn').forEach((b,i) => b.classList.toggle('checked', i===1));
+  document.querySelectorAll('#ca-cond-group .ca-radio-btn').forEach((b,i) => b.classList.toggle('checked', i===1));
   document.getElementById('ca-step-jump-bar').style.display = 'none';
   document.getElementById('ca-btn-step-save').style.display = 'none';
   document.getElementById('ca-form-screen-title').textContent = '測定データ入力';
@@ -3091,7 +3092,7 @@ function CA_editRecord() {
   const domEl = document.getElementById('f-dominant');
   if (domEl && r.dominant) domEl.value = r.dominant;
   CA_cond = r.condition || 'normal';
-  document.querySelectorAll('#CA_cond-group .radio-btn').forEach(b => {
+  document.querySelectorAll('#ca-cond-group .ca-radio-btn').forEach(b => {
     b.classList.toggle('checked', b.getAttribute('onclick').includes(`'${CA_cond}'`));
   });
   const method = r.fi_method || 'sensor';
