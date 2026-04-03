@@ -2963,22 +2963,22 @@ function CA_renderResult(r, cmpId) {
             })(), ev.finger)}
             ${CA_eRow('② 持久力', r.endurance!==null?`${r.endurance}セット`:'—', ev.endurance)}
             ${CA_eRow('③ 上肢プル', [r.pu_r!==null?`右 ${r.pu_r}kg<br>${r.pu_r_pct}%BW`:'', r.pu_l!==null?`左 ${r.pu_l}kg<br>${r.pu_l_pct}%BW`:''].filter(Boolean).join('<br>')||'—', ev.pull)}
-            ${CA_eRow('④ 肩ER/IR', [r.erir_r!==null?`右 ${r.erir_r}`:'', r.erir_l!==null?`左 ${r.erir_l}`:''].filter(Boolean).join('<br>')||'—', ev.erir, CA_sideBadges(r.erir_r, r.erir_l, evalERIR))}
+            ${CA_eRow('④ 肩ER/IR', [r.erir_r!==null?`右 ${r.erir_r}`:'', r.erir_l!==null?`左 ${r.erir_l}`:''].filter(Boolean).join('<br>')||'—', ev.erir, CA_sideBadges(r.erir_r, r.erir_l, CA_evalERIR))}
             ${CA_eRow('⑤ 体幹', [r.plank!==null?`プランク ${r.plank}秒`:'', r.lr!==null?`LR ${r.lr}回`:''].filter(Boolean).join('<br>')||'—', ev.core)}
-            ${CA_eRow('⑥ AGFR', [r.agfr_r!==null?`右 ${r.agfr_r}cm`:'', r.agfr_l!==null?`左 ${r.agfr_l}cm`:''].filter(Boolean).join('<br>')||'—', ev.agfr, CA_sideBadges(r.agfr_r, r.agfr_l, evalAGFR))}
+            ${CA_eRow('⑥ AGFR', [r.agfr_r!==null?`右 ${r.agfr_r}cm`:'', r.agfr_l!==null?`左 ${r.agfr_l}cm`:''].filter(Boolean).join('<br>')||'—', ev.agfr, CA_sideBadges(r.agfr_r, r.agfr_l, CA_evalAGFR))}
             ${CA_eRow('⑦ Straddle', r.straddle!==null?`${r.straddle}cm`:'—', ev.straddle)}
-            ${CA_eRow('⑧ 足首背屈', [r.an_r!==null?`右 ${r.an_r}cm`:'', r.an_l!==null?`左 ${r.an_l}cm`:''].filter(Boolean).join('<br>')||'—', ev.ankle, CA_sideBadges(r.an_r, r.an_l, evalAnkle))}
+            ${CA_eRow('⑧ 足首背屈', [r.an_r!==null?`右 ${r.an_r}cm`:'', r.an_l!==null?`左 ${r.an_l}cm`:''].filter(Boolean).join('<br>')||'—', ev.ankle, CA_sideBadges(r.an_r, r.an_l, CA_evalAnkle))}
             ${(r.sl_r!==null||r.sl_l!==null) ? CA_eRow('⑨ パワースラップ', [r.sl_r!==null?`右 ${r.sl_r}cm`:'', r.sl_l!==null?`左 ${r.sl_l}cm`:''].filter(Boolean).join('<br>'), ev.slap) : ''}
           </tbody>
         </table>
       </div>
     </div>
-    <div class="action-area">
-      <button class="btn btn-accent btn-block" onclick="CA_saveRecord()">💾　この結果を保存</button>
-      <button class="btn btn-block" style="background:#e8f5e9;color:#2e7d32;border:1.5px solid #81c784;" onclick="CA_openModal('modal-prompt')">🤖　AIプロンプト生成</button>
-      ${CA_current && CA_records.find(x=>x.id===CA_current.id) ? `<button class="btn btn-outline btn-block" onclick="CA_editRecord()">✏️　編集・追記</button>` : ''}
-      <button class="btn btn-outline btn-block" onclick="CA_showScreen('home')">← ホームに戻る</button>
-      ${CA_current && CA_records.find(x=>x.id===CA_current.id) ? `<button class="btn btn-block" style="background:#ffebee;color:#c62828;border:1.5px solid #e57373;" onclick="CA_deleteRecord('${CA_current.id}')">🗑　この記録を削除</button>` : ''}
+    <div class="ca-action-area">
+      <button class="ca-btn ca-btn-accent ca-btn-block" onclick="CA_saveRecord()">💾　この結果を保存</button>
+      <button class="ca-btn ca-btn-block" style="background:#e8f5e9;color:#2e7d32;border:1.5px solid #81c784;" onclick="CA_openModal('ca-modal-prompt')">🤖　AIプロンプト生成</button>
+      ${CA_current && CA_records.find(x=>x.id===CA_current.id) ? `<button class="ca-btn ca-btn-outline ca-btn-block" onclick="CA_editRecord()">✏️　編集・追記</button>` : ''}
+      <button class="ca-btn ca-btn-outline ca-btn-block" onclick="CA_showScreen('home')">← ホームに戻る</button>
+      ${CA_current && CA_records.find(x=>x.id===CA_current.id) ? `<button class="ca-btn ca-btn-block" style="background:#ffebee;color:#c62828;border:1.5px solid #e57373;" onclick="CA_deleteRecord('${CA_current.id}')">🗑　この記録を削除</button>` : ''}
     </div>
   `;
 
@@ -3078,7 +3078,7 @@ function CA_editRecord() {
   const r = CA_current;
   CA_editingId = r.id;
   CA_resetForm();
-  const sv = (id, val) => { const el = document.getElementById(id); if (el && val !== null && val !== undefined) el.value = val; };
+  const CA_sv = (id, val) => { const el = document.getElementById(id); if (el && val !== null && val !== undefined) el.value = val; };
   CA_sv('f-name', r.name);
   CA_sv('f-age', r.age);
   CA_sv('f-height', r.height);
