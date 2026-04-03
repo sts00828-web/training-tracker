@@ -2451,7 +2451,7 @@ function CA_renderHome() {
     list.innerHTML = `<div class="empty-state"><div class="empty-icon">🧗</div><div style="font-weight:bold;margin-bottom:6px;">まだ記録がありません</div><div style="font-size:13px;">右下の ＋ ボタンで測定を始めましょう</div></div>`;
     return;
   }
-  const sorted = [...records].sort((a,b) => b.date.localeCompare(a.date));
+  const sorted = [...CA_records].sort((a,b) => b.date.localeCompare(a.date));
   list.innerHTML = sorted.map(r => {
     const bmi = r.height && r.weight ? (r.weight/(r.height/100)**2).toFixed(1) : '—';
     return `<div class="record-item">
@@ -2492,7 +2492,7 @@ function CA_doImport(e) {
         CA_load();
         const ids = new Set(CA_records.map(x => x.id));
         const added = data.filter(x => !ids.has(x.id));
-        CA_records = [...records, ...added];
+        CA_records = [...CA_records, ...added];
         CA_store();
         CA_renderHome();
         alert(`${added.length}件をインポートしました。`);
