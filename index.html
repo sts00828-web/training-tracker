@@ -2837,7 +2837,7 @@ function CA_evalAnkle(cm) {
   if (cm >= 9)  return {s:42, label:'やや低い', cls:'badge-lo', txt:`${cm}cm：クライミング目標（12cm）未達。WBLTストレッチを継続してください。`, ref};
   return             {s:30, label:'要改善',   cls:'badge-po', txt:`${cm}cm：臨床的な背屈制限（<9cm）。専門家評価を推奨します。`, ref};
 }
-function evalSlap(cm) {
+function CA_evalSlap(cm) {
   if (cm === null) return null;
   const ref = 'Draper et al. 2011（IJSPP）/ Sas-Nowosielski et al. 2023 / Stien et al. 2022。ナローグリップ・反動なし・スタートラングからチョーク跡までの距離。グレードとの相関 r=0.69–0.73、ICC 0.95–0.98。';
   if (cm >= 75) return {s:75, label:'Elite相当',    cls:'badge-ex', txt:`${cm}cm → Elite（V9–V12+・75–90cm以上）レベルの上肢パワー。`, ref};
@@ -2866,11 +2866,11 @@ function CA_calcEval(r) {
     agfr:      CA_evalAGFR(agfrMin),
     straddle:  CA_evalStraddle(r.straddle),
     ankle:     CA_evalAnkle(anMin),
-    slap:      evalSlap(slDom),
+    slap:      CA_evalSlap(slDom),
   };
 }
 
-function radarScores(r) {
+function CA_radarScores(r) {
   const e = CA_calcEval(r);
   return [e.finger,e.endurance,e.pull,e.erir,e.core,e.agfr,e.straddle,e.ankle,e.slap].map(x => x?.s ?? 50);
 }
@@ -2879,7 +2879,7 @@ function radarScores(r) {
 function CA_renderResult(r, cmpId) {
   CA_load();
   const ev = CA_calcEval(r);
-  const scores = radarScores(r);
+  const scores = CA_radarScores(r);
 
   // 指力：次グレードまでのkg換算を付与
   if (ev.finger?.nextPct !== undefined) {
@@ -2951,8 +2951,8 @@ function CA_renderResult(r, cmpId) {
         <table class="eval-table">
           <thead><tr><th style="width:20%">項目</th><th style="width:28%">測定値</th><th>コメント</th><th style="width:14%">評価</th></tr></thead>
           <tbody>
-            ${eRow('⓪ BMI', r.bmi?`${r.bmi}`:'—', ev.bmi)}
-            ${eRow('① 指力', (() => {
+            ${CA_eRow('⓪ BMI', r.bmi?`${r.bmi}`:'—', ev.bmi)}
+            ${CA_eRow('① 指力', (() => {
               const parts = [];
               if (r.fi_r !== null) parts.push(`右 ${r.fi_r}kg（${r.fi_r_pct}%BW）`);
               if (r.fi_l !== null) parts.push(`左 ${r.fi_l}kg（${r.fi_l_pct}%BW）`);
@@ -2961,14 +2961,14 @@ function CA_renderResult(r, cmpId) {
               }
               return parts.join('<br>') || '—';
             })(), ev.finger)}
-            ${eRow('② 持久力', r.endurance!==null?`${r.endurance}セット`:'—', ev.endurance)}
-            ${eRow('③ 上肢プル', [r.pu_r!==null?`右 ${r.pu_r}kg<br>${r.pu_r_pct}%BW`:'', r.pu_l!==null?`左 ${r.pu_l}kg<br>${r.pu_l_pct}%BW`:''].filter(Boolean).join('<br>')||'—', ev.pull)}
-            ${eRow('④ 肩ER/IR', [r.erir_r!==null?`右 ${r.erir_r}`:'', r.erir_l!==null?`左 ${r.erir_l}`:''].filter(Boolean).join('<br>')||'—', ev.erir, sideBadges(r.erir_r, r.erir_l, evalERIR))}
-            ${eRow('⑤ 体幹', [r.plank!==null?`プランク ${r.plank}秒`:'', r.lr!==null?`LR ${r.lr}回`:''].filter(Boolean).join('<br>')||'—', ev.core)}
-            ${eRow('⑥ AGFR', [r.agfr_r!==null?`右 ${r.agfr_r}cm`:'', r.agfr_l!==null?`左 ${r.agfr_l}cm`:''].filter(Boolean).join('<br>')||'—', ev.agfr, sideBadges(r.agfr_r, r.agfr_l, evalAGFR))}
-            ${eRow('⑦ Straddle', r.straddle!==null?`${r.straddle}cm`:'—', ev.straddle)}
-            ${eRow('⑧ 足首背屈', [r.an_r!==null?`右 ${r.an_r}cm`:'', r.an_l!==null?`左 ${r.an_l}cm`:''].filter(Boolean).join('<br>')||'—', ev.ankle, sideBadges(r.an_r, r.an_l, evalAnkle))}
-            ${(r.sl_r!==null||r.sl_l!==null) ? eRow('⑨ パワースラップ', [r.sl_r!==null?`右 ${r.sl_r}cm`:'', r.sl_l!==null?`左 ${r.sl_l}cm`:''].filter(Boolean).join('<br>'), ev.slap) : ''}
+            ${CA_eRow('② 持久力', r.endurance!==null?`${r.endurance}セット`:'—', ev.endurance)}
+            ${CA_eRow('③ 上肢プル', [r.pu_r!==null?`右 ${r.pu_r}kg<br>${r.pu_r_pct}%BW`:'', r.pu_l!==null?`左 ${r.pu_l}kg<br>${r.pu_l_pct}%BW`:''].filter(Boolean).join('<br>')||'—', ev.pull)}
+            ${CA_eRow('④ 肩ER/IR', [r.erir_r!==null?`右 ${r.erir_r}`:'', r.erir_l!==null?`左 ${r.erir_l}`:''].filter(Boolean).join('<br>')||'—', ev.erir, CA_sideBadges(r.erir_r, r.erir_l, evalERIR))}
+            ${CA_eRow('⑤ 体幹', [r.plank!==null?`プランク ${r.plank}秒`:'', r.lr!==null?`LR ${r.lr}回`:''].filter(Boolean).join('<br>')||'—', ev.core)}
+            ${CA_eRow('⑥ AGFR', [r.agfr_r!==null?`右 ${r.agfr_r}cm`:'', r.agfr_l!==null?`左 ${r.agfr_l}cm`:''].filter(Boolean).join('<br>')||'—', ev.agfr, CA_sideBadges(r.agfr_r, r.agfr_l, evalAGFR))}
+            ${CA_eRow('⑦ Straddle', r.straddle!==null?`${r.straddle}cm`:'—', ev.straddle)}
+            ${CA_eRow('⑧ 足首背屈', [r.an_r!==null?`右 ${r.an_r}cm`:'', r.an_l!==null?`左 ${r.an_l}cm`:''].filter(Boolean).join('<br>')||'—', ev.ankle, CA_sideBadges(r.an_r, r.an_l, evalAnkle))}
+            ${(r.sl_r!==null||r.sl_l!==null) ? CA_eRow('⑨ パワースラップ', [r.sl_r!==null?`右 ${r.sl_r}cm`:'', r.sl_l!==null?`左 ${r.sl_l}cm`:''].filter(Boolean).join('<br>'), ev.slap) : ''}
           </tbody>
         </table>
       </div>
@@ -2982,17 +2982,17 @@ function CA_renderResult(r, cmpId) {
     </div>
   `;
 
-  drawChart(scores, r.name, cmpId);
+  CA_drawChart(scores, r.name, cmpId);
 }
 
-function eRow(name, val, ev, extraBadges='') {
+function CA_eRow(name, val, ev, extraBadges='') {
   if (!ev) return `<tr><td style="font-weight:bold;font-size:14px;">${name}</td><td style="font-size:13px;">${val||'—'}</td><td style="font-size:13px;color:#888;">—</td><td><span class="badge badge-na">未入力</span></td></tr>`;
   const refHtml = ev.ref ? `<div style="font-size:11px;color:#999;margin-top:4px;">📖 ${ev.ref}</div>` : '';
   const nextHtml = ev.nextStr ? `<div style="font-size:11px;color:#1565c0;background:#e3f2fd;padding:3px 8px;border-radius:4px;margin-top:5px;display:inline-block;">📈 ${ev.nextStr}</div>` : '';
   const badgeCol = extraBadges || `<span class="badge ${ev.cls}">${ev.label}</span>`;
   return `<tr><td style="font-weight:bold;font-size:14px;">${name}</td><td style="font-size:13px;">${val}</td><td style="font-size:14px;color:#555;">${ev.txt}${nextHtml}${refHtml}</td><td>${badgeCol}</td></tr>`;
 }
-function sideBadges(rVal, lVal, evalFn) {
+function CA_sideBadges(rVal, lVal, evalFn) {
   const parts = [];
   if (rVal !== null) { const e = evalFn(rVal); parts.push(`<div>右 <span class="badge ${e.cls}">${e.label}</span></div>`); }
   if (lVal !== null) { const e = evalFn(lVal); parts.push(`<div>左 <span class="badge ${e.cls}">${e.label}</span></div>`); }
@@ -3000,7 +3000,7 @@ function sideBadges(rVal, lVal, evalFn) {
 }
 
 // ─── レーダーチャート ─────────────────────────────────────────
-function drawChart(scores, name, cmpId) {
+function CA_drawChart(scores, name, cmpId) {
   const ctx = document.getElementById('radar-CA_chart');
   if (!ctx) return;
   if (CA_chart) { CA_chart.destroy(); CA_chart = null; }
@@ -3013,7 +3013,7 @@ function drawChart(scores, name, cmpId) {
   if (cmpId) {
     const c = CA_records.find(x => x.id===cmpId);
     if (c) {
-      const cs = radarScores(c);
+      const cs = CA_radarScores(c);
       datasets.push({
         label: `${c.name}（${CA_fmtDate(c.date)}）`, data: cs,
         backgroundColor: 'rgba(74,127,203,0.08)', borderColor: 'rgba(74,127,203,0.7)',
@@ -3042,7 +3042,7 @@ function drawChart(scores, name, cmpId) {
 
 function updateChart(cmpId) {
   if (!CA_current) return;
-  drawChart(radarScores(CA_current), CA_current.name, cmpId||null);
+  CA_drawChart(CA_radarScores(CA_current), CA_current.name, cmpId||null);
 }
 
 // ─── 保存・閲覧 ───────────────────────────────────────────────
