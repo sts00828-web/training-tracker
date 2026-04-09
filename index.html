@@ -20,7 +20,7 @@ body{
   background:var(--bg);color:var(--text);
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans JP',sans-serif;
   font-size:15px;line-height:1.6;max-width:600px;margin:0 auto;
-  padding-bottom:calc(var(--nav) + 8px);
+  padding-bottom:calc(var(--nav) + 140px);
 }
 /* Header */
 .hdr{
@@ -2022,7 +2022,7 @@ function renderSettings() {
   html += `<div class="set-section">
     <div class="set-section-ttl">プログラムインポート</div>
     <div style="font-size:12px;color:var(--text2);margin-bottom:10px;line-height:1.6;">
-      AIが生成したJSONをここに貼り付けてインポートできます。<br>
+      AIの回答をそのまま貼り付けてください（JSONブロックを自動検出します）。<br>
       ※スケジュールは上書き。トレーニングログは保持されます。
     </div>
     <textarea id="import-program-json" class="textarea" placeholder='{"schedule":[...],"customExercises":{}}' style="min-height:80px;font-size:11px;font-family:monospace;"></textarea>
@@ -2362,8 +2362,16 @@ if ('serviceWorker' in navigator) {
 // ─── プログラムインポート ─────────────────────────────────────
 function importProgramJSON() {
   const el = document.getElementById('import-program-json');
-  const txt = (el ? el.value : '').trim();
+  let txt = (el ? el.value : '').trim();
   if (!txt) { showToast('JSONを入力してください'); return; }
+  // AIの出力からJSONブロックを自動抽出
+  const jsonBlockMatch = txt.match(/```(?:json)?\s*\n?([\s\S]*?)\n?```/);
+  if (jsonBlockMatch) txt = jsonBlockMatch[1].trim();
+  // それでもJSONオブジェクトでない場合、テキスト中の最初の{...}を抽出
+  if (!txt.startsWith('{')) {
+    const braceMatch = txt.match(/\{[\s\S]*\}/);
+    if (braceMatch) txt = braceMatch[0];
+  }
   try {
     const data = JSON.parse(txt);
     if (!data.schedule || !Array.isArray(data.schedule) || data.schedule.length !== 7) {
@@ -3262,7 +3270,40 @@ ${evLine('⑧ 足首背屈（WBLT）', ev.ankle, r.an_r !== null || r.an_l !== n
 6. 怪我予防・コンディショニングの注意点
 7. 次回フィジカルチェックで確認すべき指標
 
-できる限り具体的な数値や方法を示してください。`;
+できる限り具体的な数値や方法を示してください。
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+【重要：JSONエクスポート】
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+上記の分析・提案に加えて、最後に以下の形式のJSONコードブロックを必ず出力してください。
+このJSONはアプリに直接インポートして使用します。
+
+\`\`\`json
+{
+  "schedule": [
+    {"type":"climbing|strength|rest", "label":"表示名", "sub":"サブタイトル", "exids":["種目ID", ...]},
+    ... （7要素 = 日曜〜土曜の順）
+  ],
+  "customExercises": {
+    "種目ID": {"name":"種目名", "params":"セット数×回数 等", "cat":"カテゴリ", "detail":"詳細説明"},
+    ...
+  },
+  "dailyExids": ["毎日実施する種目ID", ...]
+}
+\`\`\`
+
+■ schedule配列のルール：
+・必ず7要素（index 0=日曜, 1=月曜, ..., 6=土曜）
+・type は "climbing"、"strength"、"rest" のいずれか
+・exids には種目IDの配列（EXERCISES_MASTERの既存IDまたはcustomExercisesで定義したID）
+
+■ 使用可能な既存種目ID：
+max_hangs, repeaters, dead_hang, climbing_max, climbing_volume, climbing_explore, foot_drill, campus_ladder, explosive_pullup, lockoff, ir_band, bear_hug, scapula_prot, underclinging, coach_stretch, highstep_drill, straddle, banded_ankle, calf_raise, wblt, sleeper_stretch, finger_care
+
+■ 新しい種目が必要な場合：
+customExercises に追加し、cat は hang/climbing/power/shoulder/hip/ankle/daily/care のいずれか
+
+■ dailyExids：毎日全曜日に追加される種目ID配列（ストレッチなど）`;
 
   document.getElementById('ca-pm-text').value = prompt.replace(/^[ \t]*\n/gm, '\n').trim();
   document.getElementById('ca-pm-result').style.display = 'block';
