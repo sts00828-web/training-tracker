@@ -2373,7 +2373,9 @@ function importProgramJSON() {
     if (braceMatch) txt = braceMatch[0];
   }
   try {
-    const data = JSON.parse(txt);
+    let data = JSON.parse(txt);
+    // エクスポート形式 {"settings":{...},"logs":{...}} にも対応
+    if (data.settings && data.settings.schedule) data = data.settings;
     if (!data.schedule || !Array.isArray(data.schedule) || data.schedule.length !== 7) {
       showToast('形式エラー: scheduleは7要素の配列が必要です'); return;
     }
@@ -2383,6 +2385,7 @@ function importProgramJSON() {
     if (data.dailyExids) S.dailyExids = data.dailyExids;
     if (data.evalDates) S.evalDates = data.evalDates;
     if (data.startDate) S.startDate = data.startDate;
+    if (data.name) S.name = data.name;
     saveSettings();
     if (el) el.value = '';
     renderSettings();
