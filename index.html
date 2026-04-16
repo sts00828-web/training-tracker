@@ -1805,9 +1805,10 @@ function renderProgress() {
   }
   const monPct = monTotal ? Math.round(monDone/monTotal*100) : 0;
 
-  // Weight history (last 14 days with data)
+  // Weight history (period selectable)
+  const wPeriod = S._weightPeriod || 14;
   const weightHistory = [];
-  for (let i = 13; i >= 0; i--) {
+  for (let i = wPeriod - 1; i >= 0; i--) {
     const d = addDays(new Date(), -i);
     const key = dk(d);
     const log = getLog(key);
@@ -1845,8 +1846,14 @@ function renderProgress() {
   html += `</div>`;
 
   // Weight chart
+  const wPeriods = [{v:14,l:'2週'},{v:30,l:'1月'},{v:90,l:'3月'},{v:180,l:'6月'},{v:365,l:'1年'}];
   html += `<div class="statcard">
-    <div class="statcard-ttl">⚖️ 体重推移（目標：60 kg）</div>`;
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <div class="statcard-ttl" style="margin-bottom:0">⚖️ 体重推移（目標：60 kg）</div>
+      <div style="display:flex;gap:4px">
+        ${wPeriods.map(p => `<button onclick="setWeightPeriod(${p.v})" style="padding:3px 7px;font-size:10px;border-radius:4px;border:1px solid ${wPeriod===p.v?'var(--orange)':'var(--border)'};background:${wPeriod===p.v?'var(--orange)':'transparent'};color:${wPeriod===p.v?'#fff':'var(--text2)'};cursor:pointer;font-weight:${wPeriod===p.v?'700':'400'}">${p.l}</button>`).join('')}
+      </div>
+    </div>`;
   if (weightHistory.length === 0) {
     html += `<div class="wchart-empty">体重データがありません<br>「今日」タブから記録してください</div>`;
   } else {
@@ -1897,7 +1904,186 @@ function renderProgress() {
   }
   html += `</div>`;
 
+  // Progress summary export
+  const sumPeriods = [{v:30,l:'1ヶ月'},{v:90,l:'3ヶ月'},{v:180,l:'6ヶ月'},{v:365,l:'1年'}];
+  html += `<div class="statcard">
+    <div class="statcard-ttl">📋 進捗サマリー出力</div>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:10px;line-height:1.6;">
+      トレーニング実績・体重推移・フィジカル評価をまとめてJSON出力します。<br>
+      AIに貼り付けてメニュー改善を依頼できます。
+    </div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+      ${sumPeriods.map(p => `<button onclick="generateProgressSummary(${p.v})" style="flex:1;min-width:70px;padding:10px 6px;font-size:12px;font-weight:700;border-radius:8px;border:1.5px solid var(--orange);background:transparent;color:var(--orange);cursor:pointer">${p.l}</button>`).join('')}
+    </div>
+    <div id="summary-output" style="display:none">
+      <textarea id="summary-text" class="textarea" style="min-height:120px;font-size:10px;font-family:monospace;" readonly></textarea>
+      <div style="display:flex;gap:6px;margin-top:8px">
+        <button onclick="copySummary()" style="flex:1;padding:10px;background:var(--blue);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">📋 コピー</button>
+        <button onclick="downloadSummary()" style="flex:1;padding:10px;background:var(--green);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">💾 保存</button>
+      </div>
+      <div id="summary-copy-ok" style="display:none;text-align:center;color:var(--green);font-size:12px;margin-top:6px">✅ コピーしました</div>
+    </div>
+  </div>`;
+
   document.getElementById('prog-content').innerHTML = html;
+}
+
+// ─── 進捗サマリー生成 ─────────────────────────────────────────
+function generateProgressSummary(days) {
+  const now = new Date();
+  const startRange = addDays(now, -days);
+  const startKey = dk(startRange);
+  const endKey = dk(now);
+
+  // 日別達成率
+  const dailyStats = [];
+  let totalDone = 0, totalAll = 0;
+  const exCompletionCount = {};  // 種目ごとの完了回数
+  const exTotalCount = {};       // 種目ごとの出現回数
+  const weightData = [];
+  const rpeData = [];
+  const fingerData = [];
+  const sleepData = [];
+  const noteData = [];
+
+  for (let i = days - 1; i >= 0; i--) {
+    const d = addDays(now, -i);
+    const key = dk(d);
+    const dow = d.getDay();
+    const log = getLog(key);
+    const comp = getCompletion(key, dow);
+    const dayInfo = getDayInfo(dow);
+    const allExids = getAllExids(dow);
+
+    if (comp.total > 0) {
+      totalDone += comp.done;
+      totalAll += comp.total;
+      dailyStats.push({ date: key, dow: DOW_LABEL[dow], type: dayInfo.type, label: dayInfo.label, pct: comp.pct });
+    }
+
+    // 種目別集計
+    for (const exid of allExids) {
+      if (!exTotalCount[exid]) exTotalCount[exid] = 0;
+      if (!exCompletionCount[exid]) exCompletionCount[exid] = 0;
+      exTotalCount[exid]++;
+      if (log.done && log.done[exid]) exCompletionCount[exid]++;
+    }
+
+    if (log.weight) weightData.push({ date: key, val: log.weight });
+    if (log.rpe) rpeData.push({ date: key, val: log.rpe });
+    if (log.finger) fingerData.push({ date: key, val: log.finger });
+    if (log.sleep) sleepData.push({ date: key, val: log.sleep });
+    if (log.note) noteData.push({ date: key, note: log.note });
+  }
+
+  // 種目別達成率（名前付き）
+  const exerciseStats = {};
+  for (const [exid, total] of Object.entries(exTotalCount)) {
+    const done = exCompletionCount[exid] || 0;
+    const ex = getExercise(exid);
+    exerciseStats[exid] = {
+      name: ex.name,
+      cat: ex.cat,
+      done,
+      total,
+      pct: total ? Math.round(done / total * 100) : 0
+    };
+  }
+
+  // 週別達成率
+  const weeklyStats = [];
+  let weekStart = new Date(startRange);
+  while (weekStart <= now) {
+    let wDone = 0, wTotal = 0;
+    const wLabel = dk(weekStart);
+    for (let j = 0; j < 7 && addDays(weekStart, j) <= now; j++) {
+      const wd = addDays(weekStart, j);
+      const wk = dk(wd);
+      const wcomp = getCompletion(wk, wd.getDay());
+      wDone += wcomp.done;
+      wTotal += wcomp.total;
+    }
+    if (wTotal > 0) weeklyStats.push({ weekOf: wLabel, done: wDone, total: wTotal, pct: Math.round(wDone / wTotal * 100) });
+    weekStart = addDays(weekStart, 7);
+  }
+
+  // フィジカル評価データ（該当期間内）
+  CA_load();
+  const evalRecords = CA_records
+    .filter(r => r.date >= startKey && r.date <= endKey)
+    .sort((a, b) => a.date.localeCompare(b.date))
+    .map(r => {
+      const ev = CA_calcEval(r);
+      return {
+        date: r.date,
+        name: r.name,
+        gender: r.gender,
+        weight: r.weight,
+        height: r.height,
+        bmi: r.bmi,
+        finger: { r_pct: r.fi_r_pct, l_pct: r.fi_l_pct, eval: ev.finger?.label },
+        endurance: { sets: r.endurance, eval: ev.endurance?.label },
+        pull: { r_pct: r.pu_r_pct, l_pct: r.pu_l_pct, eval: ev.pull?.label },
+        erir: { r: r.erir_r, l: r.erir_l, eval: ev.erir?.label },
+        core: { plank: r.plank, lr: r.lr, eval: ev.core?.label },
+        agfr: { r: r.agfr_r, l: r.agfr_l, eval: ev.agfr?.label },
+        straddle: { val: r.straddle, eval: ev.straddle?.label },
+        ankle: { r: r.an_r, l: r.an_l, eval: ev.ankle?.label },
+        powerSlap: { r: r.sl_r, l: r.sl_l, eval: ev.slap?.label },
+      };
+    });
+
+  // 現在のスケジュール
+  const sched = (S && S.schedule) ? S.schedule : DEFAULT_SCHEDULE;
+  const currentSchedule = sched.map((day, i) => ({
+    dow: DOW_LABEL[i],
+    type: day.type,
+    label: day.label,
+    sub: day.sub,
+    exercises: day.exids.map(id => { const ex = getExercise(id); return { id, name: ex.name, params: ex.params }; })
+  }));
+
+  const summary = {
+    period: { from: startKey, to: endKey, days },
+    profile: { name: S.name || '', startDate: S.startDate || '' },
+    overallCompletion: { done: totalDone, total: totalAll, pct: totalAll ? Math.round(totalDone / totalAll * 100) : 0 },
+    weeklyCompletion: weeklyStats,
+    exerciseCompletion: exerciseStats,
+    weightHistory: weightData,
+    rpeHistory: rpeData,
+    fingerCondition: fingerData,
+    sleepHistory: sleepData,
+    notes: noteData,
+    physicalAssessments: evalRecords,
+    currentSchedule,
+    kpiTargets: PHASE_KPIS,
+  };
+
+  const json = JSON.stringify(summary, null, 2);
+  document.getElementById('summary-text').value = json;
+  document.getElementById('summary-output').style.display = 'block';
+  document.getElementById('summary-copy-ok').style.display = 'none';
+}
+
+function copySummary() {
+  const el = document.getElementById('summary-text');
+  el.select();
+  el.setSelectionRange(0, 999999);
+  navigator.clipboard.writeText(el.value).catch(() => document.execCommand('copy'));
+  document.getElementById('summary-copy-ok').style.display = 'block';
+  setTimeout(() => { document.getElementById('summary-copy-ok').style.display = 'none'; }, 2000);
+}
+
+function downloadSummary() {
+  const text = document.getElementById('summary-text').value;
+  if (!text) return;
+  const blob = new Blob([text], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `progress_summary_${todayKey()}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
 }
 
 function renderSettings() {
@@ -2075,6 +2261,12 @@ function calSelectDay(key) {
   calSelectedKey = calSelectedKey === key ? null : key;
   renderCalendar();
   if (!calSelectedKey) document.getElementById('cal-detail').innerHTML = '';
+}
+
+function setWeightPeriod(days) {
+  S._weightPeriod = days;
+  saveSettings();
+  renderProgress();
 }
 
 function updateSetting(field, val) {
