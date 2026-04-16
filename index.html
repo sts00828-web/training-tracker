@@ -1858,28 +1858,72 @@ function renderProgress() {
     html += `<div class="wchart-empty">体重データがありません<br>「今日」タブから記録してください</div>`;
   } else {
     const vals = weightHistory.map(w => w.val);
-    const maxW = Math.max(...vals, 66);
-    const minW = Math.min(...vals, 59);
+    const maxW = Math.ceil(Math.max(...vals, 66));
+    const minW = Math.floor(Math.min(...vals, 59));
     const range = maxW - minW || 1;
-    html += `<div style="position:relative;height:100px;margin:8px 0 4px">
-      <div style="position:absolute;top:0;right:0;left:0;height:1px;background:#ddd"></div>
-      <div style="position:absolute;left:0;right:0;font-size:10px;color:var(--text2);top:-14px;text-align:right">${maxW}kg</div>`;
-    // Target line at 60kg
-    const targetPct = (maxW - 60) / range * 100;
-    if (targetPct >= 0 && targetPct <= 100) {
-      html += `<div style="position:absolute;left:0;right:0;top:${targetPct}%;border-top:2px dashed var(--green);opacity:.7"></div>
-      <div style="position:absolute;right:0;top:${targetPct}%;font-size:9px;color:var(--green);transform:translateY(-12px)">目標60kg</div>`;
+    const svgW = 540, svgH = 120, padL = 36, padR = 10, padT = 16, padB = 24;
+    const chartW = svgW - padL - padR;
+    const chartH = svgH - padT - padB;
+    const n = weightHistory.length;
+
+    // SVG折れ線グラフ
+    html += `<div style="width:100%;overflow-x:auto;margin:8px 0 4px">
+    <svg viewBox="0 0 ${svgW} ${svgH}" style="width:100%;height:auto;min-height:100px;max-height:160px" preserveAspectRatio="xMidYMid meet">`;
+
+    // Y軸グリッド線とラベル
+    const ySteps = range <= 4 ? 1 : range <= 10 ? 2 : 5;
+    for (let v = minW; v <= maxW; v += ySteps) {
+      const y = padT + (maxW - v) / range * chartH;
+      html += `<line x1="${padL}" y1="${y}" x2="${svgW - padR}" y2="${y}" stroke="#e0e0e0" stroke-width="0.5"/>`;
+      html += `<text x="${padL - 4}" y="${y + 3}" text-anchor="end" font-size="8" fill="#999">${v}</text>`;
     }
-    html += `<div style="display:flex;align-items:flex-end;height:100%;gap:3px;padding-top:4px">`;
-    for (const w of weightHistory) {
-      const h = Math.max(4, Math.round((w.val - minW) / range * 80 + 10));
-      html += `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;justify-content:flex-end">
-        <div style="font-size:8px;color:var(--text2)">${w.val}</div>
-        <div style="width:100%;height:${h}px;background:var(--orange);border-radius:2px 2px 0 0;min-height:4px"></div>
-        <div style="font-size:7px;color:var(--text2);white-space:nowrap">${w.label}</div>
-      </div>`;
+
+    // 目標60kgライン
+    if (60 >= minW && 60 <= maxW) {
+      const ty = padT + (maxW - 60) / range * chartH;
+      html += `<line x1="${padL}" y1="${ty}" x2="${svgW - padR}" y2="${ty}" stroke="var(--green)" stroke-width="1.5" stroke-dasharray="6,3" opacity="0.7"/>`;
+      html += `<text x="${svgW - padR}" y="${ty - 4}" text-anchor="end" font-size="8" fill="var(--green)">目標60kg</text>`;
     }
-    html += `</div></div>`;
+
+    // データポイント座標計算
+    const points = weightHistory.map((w, i) => ({
+      x: padL + (n > 1 ? i / (n - 1) * chartW : chartW / 2),
+      y: padT + (maxW - w.val) / range * chartH,
+      val: w.val,
+      label: w.label
+    }));
+
+    // 塗りつぶしエリア
+    const areaPath = `M${points[0].x},${padT + chartH} ${points.map(p => `L${p.x},${p.y}`).join(' ')} L${points[n-1].x},${padT + chartH} Z`;
+    html += `<path d="${areaPath}" fill="var(--orange)" opacity="0.12"/>`;
+
+    // 折れ線
+    const linePath = points.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x},${p.y}`).join(' ');
+    html += `<path d="${linePath}" fill="none" stroke="var(--orange)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`;
+
+    // ドットと値ラベル（多すぎる場合は間引き）
+    const showEvery = n <= 14 ? 1 : n <= 30 ? 2 : n <= 90 ? 7 : Math.ceil(n / 12);
+    for (let i = 0; i < n; i++) {
+      const p = points[i];
+      const showLabel = (i % showEvery === 0) || i === 0 || i === n - 1;
+      if (showLabel) {
+        html += `<circle cx="${p.x}" cy="${p.y}" r="3" fill="var(--orange)" stroke="#fff" stroke-width="1.5"/>`;
+        html += `<text x="${p.x}" y="${p.y - 7}" text-anchor="middle" font-size="7.5" font-weight="700" fill="var(--text)">${p.val}</text>`;
+      } else {
+        html += `<circle cx="${p.x}" cy="${p.y}" r="1.5" fill="var(--orange)" opacity="0.6"/>`;
+      }
+    }
+
+    // X軸ラベル（間引き）
+    const xLabelEvery = n <= 14 ? 1 : n <= 30 ? 5 : n <= 90 ? 14 : Math.ceil(n / 8);
+    for (let i = 0; i < n; i++) {
+      if ((i % xLabelEvery === 0) || i === n - 1) {
+        const p = points[i];
+        html += `<text x="${p.x}" y="${svgH - 4}" text-anchor="middle" font-size="7" fill="#999">${weightHistory[i].label}</text>`;
+      }
+    }
+
+    html += `</svg></div>`;
   }
   html += `</div>`;
 
