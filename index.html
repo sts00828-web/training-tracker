@@ -2249,8 +2249,14 @@ function renderSettings() {
   // Data management
   html += `<div class="set-section">
     <div class="set-section-ttl">データ管理</div>
-    <button class="danger-btn" onclick="resetSchedule()">スケジュールをデフォルトに戻す</button>
-    <button class="danger-btn" style="border-color:#aaa;color:#aaa;margin-top:6px" onclick="exportData()">データをエクスポート（JSON）</button>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:10px;line-height:1.6;">
+      機種変更・PWA再インストール時はこのバックアップが必要です。<br>
+      設定＋トレーニングログ（日々のチェック・体重・指の状態など）すべてを保存・復元します。
+    </div>
+    <button class="danger-btn" style="border-color:var(--blue);color:var(--blue)" onclick="exportData()">📤 バックアップ（JSONエクスポート）</button>
+    <button class="danger-btn" style="border-color:var(--blue);color:var(--blue);margin-top:6px" onclick="document.getElementById('restore-backup-file').click()">📥 バックアップから復元（JSON）</button>
+    <input type="file" id="restore-backup-file" accept=".json,application/json" style="display:none" onchange="restoreBackup(event)">
+    <button class="danger-btn" style="margin-top:14px" onclick="resetSchedule()">スケジュールをデフォルトに戻す</button>
   </div>`;
 
   html += `<div class="set-section">
@@ -2526,6 +2532,41 @@ function exportData() {
   a.download = `v8_training_${todayKey()}.json`;
   a.click();
   URL.revokeObjectURL(url);
+}
+
+function restoreBackup(e) {
+  const f = e.target.files && e.target.files[0];
+  e.target.value = '';
+  if (!f) return;
+  const r = new FileReader();
+  r.onload = ev => {
+    let data;
+    try { data = JSON.parse(ev.target.result); }
+    catch (err) { alert('JSON解析エラー: ' + err.message); return; }
+    if (!data || typeof data !== 'object' || !data.settings || !data.logs) {
+      alert('バックアップ形式エラー：{"settings":{...},"logs":{...}} 形式が必要です。'); return;
+    }
+    if (!data.settings.schedule || !Array.isArray(data.settings.schedule) || data.settings.schedule.length !== 7) {
+      alert('バックアップ形式エラー：settings.schedule が不正です。'); return;
+    }
+    const logCount = Object.keys(data.logs || {}).length;
+    const currentLogCount = Object.keys(L || {}).length;
+    const msg = `バックアップから復元します。\n\n` +
+      `・復元するログ：${logCount}日分\n` +
+      `・現在のログ：${currentLogCount}日分（上書きされます）\n` +
+      `・プログラム開始日：${data.settings.startDate || '未設定'}\n\n` +
+      `現在のデータは完全に置き換わります。よろしいですか？`;
+    if (!confirm(msg)) return;
+    S = data.settings;
+    L = data.logs;
+    saveSettings();
+    localStorage.setItem('v8_logs', JSON.stringify(L));
+    renderHeader();
+    renderToday();
+    renderSettings();
+    showToast(`復元しました（ログ${logCount}日分）`);
+  };
+  r.readAsText(f);
 }
 
 let toastTimer = null;
