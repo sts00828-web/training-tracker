@@ -474,10 +474,10 @@ body{
     .ca-summary-item { font-size: 12px; color: #666; line-height: 1.6; }
     .ca-diff-note { margin: 0 12px 10px; background: #fff3e0; border-left: 3px solid #e65100; padding: 8px 12px; border-radius: 0 6px 6px 0; font-size: 12px; color: #555; }
     .ca-cond-note { margin: 8px 12px 0; background: #fff8e1; border-left: 3px solid #f9a825; padding: 8px 12px; border-radius: 0 6px 6px 0; font-size: 12px; color: #555; }
-    .ca-eval-table { width: 100%; border-collapse: collapse; font-size: 15px; }
-    .ca-eval-table th { background: var(--primary); color: #fff; padding: 8px 6px; text-align: center; }
-    .ca-eval-table td { border: 1px solid #eee; padding: 8px 6px; vertical-align: top; }
-    .ca-eval-table tr:nth-child(even) td { background: #fafafa; }
+    .ca-eval-table, .eval-table { width: 100%; border-collapse: collapse; font-size: 15px; border: 1px solid #888; }
+    .ca-eval-table th, .eval-table th { background: var(--primary); color: #fff; padding: 8px 6px; text-align: center; border: 1px solid #555; }
+    .ca-eval-table td, .eval-table td { border: 1px solid #888; padding: 8px 6px; vertical-align: top; }
+    .ca-eval-table tr:nth-child(even) td, .eval-table tr:nth-child(even) td { background: #fafafa; }
     .ca-badge { display: inline-block; padding: 3px 9px; border-radius: 10px; font-size: 12px; font-weight: bold; white-space: nowrap; }
     .ca-badge-ex { background: #c8e6c9; color: #1b5e20; }
     .ca-badge-gd { background: #dcedc8; color: #33691e; }
@@ -1775,9 +1775,13 @@ function renderCalDetail(key) {
   document.getElementById('cal-detail').innerHTML = html;
 }
 
+function getPhaseKPIs() {
+  return (S && Array.isArray(S.phaseKPIs) && S.phaseKPIs.length === 3) ? S.phaseKPIs : PHASE_KPIS;
+}
 function renderProgress() {
   const phase = getPhase();
-  const phaseInfo = PHASE_KPIS[phase-1];
+  const PK = getPhaseKPIs();
+  const phaseInfo = PK[phase-1];
   const streak = calcStreak();
 
   // Weekly stats (last 7 days)
@@ -1936,7 +1940,7 @@ function renderProgress() {
       const evDate = parseDate(d);
       const now2 = new Date(); now2.setHours(0,0,0,0);
       const diff = Math.round((evDate - now2) / 86400000);
-      const phaseKpi = PHASE_KPIS[i];
+      const phaseKpi = PK[i];
       html += `<div class="kpi-item">
         <div>
           <div class="kpi-lbl">Month ${i+1} 評価日</div>
@@ -2100,7 +2104,7 @@ function generateProgressSummary(days) {
     notes: noteData,
     physicalAssessments: evalRecords,
     currentSchedule,
-    kpiTargets: PHASE_KPIS,
+    kpiTargets: getPhaseKPIs(),
   };
 
   const json = JSON.stringify(summary, null, 2);
@@ -2620,7 +2624,9 @@ function importProgramJSON() {
     if (data.customExercises) S.customExercises = Object.assign({}, S.customExercises || {}, data.customExercises);
     if (data.dailyExids) S.dailyExids = data.dailyExids;
     if (data.evalDates) S.evalDates = data.evalDates;
-    if (data.startDate) S.startDate = data.startDate;
+    // startDate は既存値を優先（プログラム継続のためフェーズ計算を保つ）
+    if (data.startDate && !S.startDate) S.startDate = data.startDate;
+    if (data.phaseKPIs) S.phaseKPIs = data.phaseKPIs;
     if (data.name) S.name = data.name;
     saveSettings();
     if (el) el.value = '';
@@ -3099,7 +3105,7 @@ function CA_calcEval(r) {
   const fiAvgPct = (r.fi_r_pct!==null && r.fi_l_pct!==null) ? (r.fi_r_pct+r.fi_l_pct)/2 : (r.fi_r_pct??r.fi_l_pct);
   const fingerEv = CA_evalFinger(fiAvgPct, r.gender);
   const puDom    = dominant==='left' ? r.pu_l_pct : r.pu_r_pct;
-  const erirAvg  = (r.erir_r!==null && r.erir_l!==null) ? (r.erir_r+r.erir_l)/2 : (r.erir_r??r.erir_l);
+  const erirAvg  = (r.erir_r!==null && r.erir_l!==null) ? Math.round((r.erir_r+r.erir_l)/2*100)/100 : (r.erir_r??r.erir_l);
   const agfrMin  = (r.agfr_r!==null && r.agfr_l!==null) ? Math.min(r.agfr_r, r.agfr_l) : (r.agfr_r??r.agfr_l);
   const anMin    = (r.an_r!==null && r.an_l!==null) ? Math.min(r.an_r, r.an_l) : (r.an_r??r.an_l);
   const slDom    = dominant==='left' ? r.sl_l : r.sl_r;
@@ -3407,6 +3413,25 @@ function CA_generatePrompt() {
   const targetWeight = document.getElementById('ca-pm-target-weight').value;
   const freq         = document.getElementById('ca-pm-freq').value;
   const notes        = document.getElementById('ca-pm-notes').value;
+
+  // 継続プログラム判定（既存のS.startDateがあれば継続）
+  const currentPhase = (typeof getPhase === 'function' && S && S.startDate) ? getPhase() : null;
+  const nextPhase = currentPhase ? Math.min(currentPhase + 1, 3) : 1;
+  const isContinuation = !!currentPhase;
+  const currentKPIs = (typeof getPhaseKPIs === 'function') ? getPhaseKPIs() : (typeof PHASE_KPIS !== 'undefined' ? PHASE_KPIS : null);
+  const continuationBlock = isContinuation
+    ? `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+【継続プログラム情報】※必ず考慮してください
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+・現在のフェーズ：MONTH ${currentPhase}（${currentPhase}か月目評価が完了）
+・プログラム開始日：${S.startDate}
+・本評価結果を踏まえて MONTH ${nextPhase} 以降の継続プログラムを作成してください（リセットせず段階的進行）。
+・前回フェーズで設定されていたKPI目標（参考）：
+${currentKPIs ? currentKPIs.map((p,i) => `  Month ${i+1}: ${p.kpis.map(k => k.label+'='+k.target).join(' / ')}`).join('\n') : '  （未設定）'}
+・本評価で達成されたKPIは新しい目標に置き換え、未達のKPIは継続または難度調整して phaseKPIs に出力してください。
+
+`
+    : '';
   const genderLabel = r.gender === 'female' ? '女性' : '男性';
   const condLabel   = {good:'絶好調', normal:'普通', tired:'疲労あり'}[r.condition] || '普通';
 
@@ -3427,7 +3452,7 @@ function CA_generatePrompt() {
 
   const prompt = `あなたはスポーツクライミングの専門トレーナーです。以下のフィジカル評価結果をもとに、パーソナライズされたトレーニングプログラムを作成してください。
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+${continuationBlock}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 【プロフィール】
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ${line('氏名', r.name)}
@@ -3527,9 +3552,19 @@ ${evLine('⑧ 足首背屈（WBLT）', ev.ankle, r.an_r !== null || r.an_l !== n
     "種目ID": {"name":"種目名", "params":"セット数×回数 等", "cat":"カテゴリ", "detail":"詳細説明"},
     ...
   },
-  "dailyExids": ["毎日実施する種目ID", ...]
+  "dailyExids": ["毎日実施する種目ID", ...],
+  "phaseKPIs": [
+    {"month":1, "label":"MONTH 1 — 〇〇", "color":"#c05000", "kpis":[{"label":"指標名","target":"目標値"}, ...]},
+    {"month":2, "label":"MONTH 2 — 〇〇", "color":"#1a6ea8", "kpis":[...]},
+    {"month":3, "label":"MONTH 3 — 〇〇", "color":"#2a7a22", "kpis":[...]}
+  ]
 }
 \`\`\`
+
+■ phaseKPIsのルール（重要）：
+・必ず3要素（Month 1, 2, 3）。各KPIは {label, target} の形式。
+・本評価で達成済みのKPIは「次の段階の目標」に更新。未達は継続/難度調整。
+・継続プログラムの場合、すでに完了したフェーズも含め3か月分すべて記載してください（履歴として保持）。
 
 ■ schedule配列のルール：
 ・必ず7要素（index 0=日曜, 1=月曜, ..., 6=土曜）
