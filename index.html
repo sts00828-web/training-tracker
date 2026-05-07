@@ -2185,11 +2185,23 @@ function renderSettings() {
   }
   html += `</div>`;
 
-  // Current day info
+  // Current day info（編集可）
   const dayInfo = sched[activeDow];
   const allIds = getAllExids(activeDow);
-  html += `<div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:8px">
-    ${dayInfo.label} — ${dayInfo.sub}
+  html += `<div style="background:#f7f5f2;border:1px solid var(--border);border-radius:8px;padding:10px;margin-bottom:10px">
+    <div style="font-size:11px;color:var(--text2);margin-bottom:4px">この日の表示（「今日」タブのバナー文言）</div>
+    <div style="display:flex;gap:6px;margin-bottom:6px">
+      <select class="set-inp" style="flex:0 0 110px;font-size:12px"
+        onchange="updateDayField(${activeDow},'type',this.value)">
+        <option value="climbing" ${dayInfo.type==='climbing'?'selected':''}>climbing</option>
+        <option value="strength" ${dayInfo.type==='strength'?'selected':''}>strength</option>
+        <option value="rest" ${dayInfo.type==='rest'?'selected':''}>rest</option>
+      </select>
+      <input class="set-inp" type="text" placeholder="ラベル（例: HANG昼）" value="${(dayInfo.label||'').replace(/"/g,'&quot;')}"
+        onchange="updateDayField(${activeDow},'label',this.value)" style="flex:1;font-size:13px">
+    </div>
+    <input class="set-inp" type="text" placeholder="サブタイトル（例: 昼休みトレーニング）" value="${(dayInfo.sub||'').replace(/"/g,'&quot;')}"
+      onchange="updateDayField(${activeDow},'sub',this.value)" style="font-size:12px">
   </div>`;
 
   // Exercises in this day
@@ -2341,6 +2353,15 @@ function updateEvalDate(idx, val) {
 function selectDow(dow) {
   S._settingsDow = dow;
   renderSettings();
+}
+
+function updateDayField(dow, field, val) {
+  if (!S.schedule) S.schedule = JSON.parse(JSON.stringify(DEFAULT_SCHEDULE));
+  S.schedule[dow][field] = val;
+  saveSettings();
+  renderSettings();
+  renderToday();
+  showToast('保存しました');
 }
 
 function removeExFromDay(dow, exid) {
@@ -3613,6 +3634,8 @@ ${evLine('⑧ 足首背屈（WBLT）', ev.ankle, r.an_r !== null || r.an_l !== n
 ・必ず7要素（index 0=日曜, 1=月曜, ..., 6=土曜）
 ・type は "climbing"、"strength"、"rest" のいずれか
 ・exids には種目IDの配列（EXERCISES_MASTERの既存IDまたはcustomExercisesで定義したID）
+・label / sub は exids の内容と必ず一致させてください（例: exidsにmax_hangsが入っているならlabelに"HANG"等を含める／restなら"REST"／クライミングセッションなら"CLIMB"等）。「FULL REST」と書いて筋トレ種目を入れる等の不一致は禁止。
+・dailyExids（毎日ケア）に含まれる種目は schedule.exids に重複して入れないでください（自動的に毎日表示されます）。
 
 ■ 使用可能な既存種目ID：
 max_hangs, repeaters, dead_hang, climbing_max, climbing_volume, climbing_explore, foot_drill, campus_ladder, explosive_pullup, lockoff, ir_band, bear_hug, scapula_prot, underclinging, coach_stretch, highstep_drill, straddle, banded_ankle, calf_raise, wblt, sleeper_stretch, finger_care
